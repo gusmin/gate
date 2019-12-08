@@ -1,0 +1,47 @@
+[Hello]
+other = "Hi {{.Firstname}} {{.Lastname}} ! Sup ?"
+
+[Goodbye]
+other = "See ya next time {{.Firstname}} {{.Lastname}}..."
+
+[ID]
+other = "ID"
+
+[Name]
+other = "Name"
+
+[IP]
+other = "IP"
+
+[AgentPort]
+other = "Port"
+
+[ListCaption]
+other = "Available nodes."
+
+[Email]
+other = "Email"
+
+[Firstname]
+other = "Firstname"
+
+[Lastname]
+other = "Lastname"
+
+[Job]
+other = "Job"
+
+[MeCaption]
+other = "You."
+
+[ConnectShortDesc]
+other = "Open SSH connection toward the machine"
+
+[ExitShortDesc]
+other = "Close the Secure Gate shell"
+
+[ListShortDesc]
+other = "List available machines informations"
+
+[MeShortDesc]
+other = "Display user informations"

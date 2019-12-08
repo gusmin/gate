@@ -1,0 +1,47 @@
+[Hello]
+other = "{{.Firstname}} {{.Lastname}} 안녕! 잘 지냈어요 ?"
+
+[Goodbye]
+other = "안녕히가세요 {{.Firstname}} {{.Lastname}} 고객님 ! 또 오세요 !"
+
+[ID]
+other = "아이디"
+
+[Name]
+other = "이름"
+
+[IP]
+other = "아이피"
+
+[AgentPort]
+other = "포트"
+
+[ListCaption]
+other = "가도 된 서버들."
+
+[Email]
+other = "이메일"
+
+[Firstname]
+other = "서례명"
+
+[Lastname]
+other = "성씨"
+
+[Job]
+other = "직업"
+
+[MeCaption]
+other = "당신."
+
+[ConnectShortDesc]
+other = "서버로 SSH 연결 열기"
+
+[ExitShortDesc]
+other = "Secure Gate 닫기"
+
+[ListShortDesc]
+other = "가도 된 서버들의 정보들을 나열하기"
+
+[MeShortDesc]
+other = "사용자의 정보들을 표시하기"

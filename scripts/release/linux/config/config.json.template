@@ -1,0 +1,5 @@
+{
+  "backend_uri": "http://localhost:3000/graphql",
+  "ssh_user": "gateuser"
+  "agent_authentication_token": ""
+}

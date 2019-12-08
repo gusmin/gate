@@ -1,0 +1,47 @@
+[Hello]
+other = "Salut {{.Firstname}} {{.Lastname}} ! Ca va bien depuis la derniere fois ?"
+
+[Goodbye]
+other = "A la prochaine {{.Firstname}} {{.Lastname}} !"
+
+[ID]
+other = "ID"
+
+[Name]
+other = "Nom"
+
+[IP]
+other = "IP"
+
+[AgentPort]
+other = "Port"
+
+[ListCaption]
+other = "Machines disponibles."
+
+[Email]
+other = "Email"
+
+[Firstname]
+other = "Prenom"
+
+[Lastname]
+other = "Nom"
+
+[Job]
+other = "Occupation"
+
+[MeCaption]
+other = "Toi."
+
+[ConnectShortDesc]
+other = "Ouvre une connexion SSH vers la machine"
+
+[ExitShortDesc]
+other = "Quitte le shell Secure Gate"
+
+[ListShortDesc]
+other = "Liste les informations de chaques machines accessibles"
+
+[MeShortDesc]
+other = "Affiche les informations de l'utilisateur"
