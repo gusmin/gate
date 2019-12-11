@@ -1,7 +1,8 @@
 # Secure Gate - Gate <img src="https://media.discordapp.net/attachments/433311912281767978/626863798610821130/logo_400dpi.png?width=764&height=884" width=60>
 
-[![Built with Mage](https://magefile.org/badge.svg)](https://magefile.org)
+[![GoDoc](https://godoc.org/github.com/gusmin/gate/pkg?status.svg)](https://godoc.org/github.com/gusmin/gate/pkg)
 [![Build Status](https://travis-ci.com/gusmin/gate.svg?token=6WEq9jpFesV2iXzoQsy4&branch=master)](https://travis-ci.com/gusmin/gate)
+[![Built with Mage](https://magefile.org/badge.svg)](https://magefile.org)
 
 **Gate** is an essential part of the **Secure Gate** project.
 
