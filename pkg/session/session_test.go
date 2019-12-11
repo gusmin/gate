@@ -145,7 +145,6 @@ func TestSignUp(t *testing.T) {
 func TestInitSSHKeys(t *testing.T) {
 	assert := require.New(t)
 
-	logger := NewLogrusLogger(logrus.New())
 	sg := New("randomUser", nil, nil, logger)
 
 	err := sg.initSSHKeys(os.TempDir())

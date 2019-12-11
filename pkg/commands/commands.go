@@ -21,6 +21,7 @@ func NewSecureGateCommand(sess *session.SecureGateSession) *SecureGateCommand {
 		newListCommand(sess),
 		newMeCommand(sess),
 		newConnectCommand(sess),
+		newLogoutCommand(sess),
 		newExitCommand(sess),
 	)
 

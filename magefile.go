@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	version           = "1.0.1-beta"
+	version           = "0.0.3"
 	packageName       = "github.com/gusmin/gate"
 	golintPackage     = "golang.org/x/lint/golint"
 	securegateKeysDir = ".sgsh"
@@ -24,6 +24,11 @@ const (
 	releaseBinName    = "securegate-gate"
 	configFile        = "config.json"
 	configDir         = "/etc/securegate/gate"
+	logDir            = "/var/log/securegate/gate"
+	secureGateLibDir  = "/var/lib/securegate/gate"
+	translations      = "./translations/"
+	translationsDir   = "/var/lib/securegate/gate/translations"
+	translationsTar   = "translations.tgz"
 )
 
 var (
@@ -37,6 +42,7 @@ var (
 	goLint    = sh.RunCmd("golint")
 )
 
+// Release Type to create release namespace
 type Release mg.Namespace
 
 // Default target to run when none is specified
@@ -51,60 +57,83 @@ func init() {
 	}
 }
 
-// Create release tarbal with linux binary
+// Linux Create release tarbal with linux binary
 func (Release) Linux() error {
-	fmt.Println("Building...")
-	env := map[string]string{
-		"GOOS":   "linux",
-		"GOARCH": "amd64",
+	fmt.Println("[>] Creating Linux release")
+	fmt.Println("[>] Setting up environment")
+	var err error
+	err = os.Setenv("GOOS", "linux")
+	if err != nil {
+		log.Fatal(err)
 	}
-	err := sh.RunWith(env, goCmd, "build", "-o", releaseBinDir+"/"+releaseBinName)
+	err = os.Setenv("GOARCH", "amd64")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("[>] Building")
+	err = goBuild("-o", releaseBinDir+"/"+releaseBinName)
 	if err != nil {
 		fmt.Println(err)
 		return err
+	}
+	fmt.Println("[>] Creating translations archive")
+	out, err := exec.Command("/usr/bin/tar", "-zcf", releaseDir+"/"+translationsTar, translations).Output()
+	if len(out) != 0 {
+		fmt.Println(out)
+	}
+	if err != nil {
+		log.Fatal(err)
 	}
 	err = os.Chdir(releaseDir)
 	if err != nil {
 		return err
 	}
-	fmt.Println("Creating release...")
-	return sh.Run("./release.sh", version)
+	fmt.Println("[>] Creating release version " + version)
+	err = sh.Run("./release.sh", version)
+	if err != nil {
+		return err
+	}
+	fmt.Println("[+] Release available in directory ./scripts/release/releases/")
+	return nil
 }
 
-// A custom install step if you need your bin someplace other than go/bin
+// Install A custom install step if you need your bin someplace other than go/bin
 func Install() error {
-	fmt.Println("Installing...")
+	fmt.Println("[>] Installing")
 
 	makeSGSHDir()
-	initConfig()
-	golintInstall()
+	makeLogDir()
+	installTranslations()
+	initConfiguration()
 
 	return goInstall(packageName)
 }
 
-// Run go vet linter
+// Vet Run go vet linter
 func Vet() error {
+	fmt.Println("[>] Code analysis")
 	return goVet("./...")
 }
 
-// Run golint linter
+// Golint Run golint linter
 func Golint() error {
+	golintInstall()
+	fmt.Println("[>] Linting")
 	return goLint("./...")
 }
 
-// Run all linters in parallel (e.g. go vet, golint...)
+// Lint Run all linters in parallel (e.g. go vet, golint...)
 func Lint() {
-	fmt.Println("Linting...")
 	mg.Deps(Vet, Golint)
 }
 
-// Run tests
+// Test Run tests
 func Test() error {
-	fmt.Println("Testing...")
+	fmt.Println("[>] Testing")
 	return goTest("-v", "./...")
 }
 
-// Run tests and linter
+// Check Run tests and linter
 func Check() {
 	mg.Deps(Lint)
 	mg.Deps(Test)
@@ -119,63 +148,141 @@ func exists(path string) (bool, error) {
 }
 
 func golintInstall() {
-	fmt.Println("Checking for existing linter...")
+	fmt.Println("[>] Checking for existing linter")
 	if err := goList(golintPackage); err != nil {
-		fmt.Println("Linter does not exists")
-		fmt.Println("Installing golint linter...")
+		fmt.Println("[-] Linter does not exists")
+		fmt.Println("[+] Installing golint linter")
 		if err := goGet("-u", golintPackage); err != nil {
 			log.Fatal(err)
 		}
 	}
 }
 
-func initConfig() {
-	fmt.Println("Checking for existing config file config.json...")
+func initConfiguration() {
+	fmt.Println("[>] Checking for existing configuration file config.json")
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		fmt.Println("You need to copy config.json.templatem to config.json and " +
+		fmt.Println("[x] You need to copy config.json.templatem to config.json and " +
 			"complete the configuration before launching the installation")
 		log.Fatal(err)
 	} else {
-		fmt.Println("Exists.")
+		fmt.Println("[>] Configuration file already exists")
 	}
-	fmt.Println("Checking for existing config directory in /etc/...")
+	fmt.Println("[>] Checking for existing configuration directory in /etc/securegate")
 	ok, err := exists(configDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if !ok {
-		fmt.Println("Making directory for Secure Gate config files...")
+		fmt.Println("[+] Creating directory for Secure Gate configuration files")
 		out, err := exec.Command("/bin/sh", "-c", "sudo mkdir -p "+configDir).Output()
+		if len(out) != 0 {
+			fmt.Print(out)
+		}
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Print(out)
+		fmt.Println("[+] Configuration directory created")
 	} else {
-		fmt.Println("Already exists.")
+		fmt.Println("[>] Config directory already exists")
 	}
-	fmt.Println("Initialize basic configuration for Secure Gate...")
-	err = sh.Run("/bin/sh", "-c", "sudo cp "+configFile+" "+configDir+"/"+configFile)
+	fmt.Println("[>] Initialize basic configuration for Secure Gate")
+	out, err := exec.Command("/bin/sh", "-c", "sudo cp "+configFile+" "+configDir+"/"+configFile).Output()
+	if len(out) != 0 {
+		fmt.Println(out)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Done.")
+	fmt.Println("[+] Basic configuration created")
 }
 
 func makeSGSHDir() {
 	home := os.Getenv("HOME")
 	finalPath := path.Join(home, securegateKeysDir)
-	fmt.Println("Checking for existing secret keys directory in $HOME...")
+	fmt.Println("[>] Checking for existing secret keys directory in $HOME")
 	ok, err := exists(finalPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if !ok {
-		fmt.Println("Making new secret keys directory in $HOME...")
+		fmt.Println("[>] Creating new secret keys directory in $HOME")
 		err := os.Mkdir(finalPath, 0777)
 		if err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("[+] Secret keys directory created")
 	} else {
-		fmt.Println("Already exists.")
+		fmt.Println("[>] Secret keys directory already exists")
 	}
+}
+
+func makeLogDir() {
+	user := os.Getenv("USER")
+	fmt.Println("[>] Checking for existing log directory")
+	ok, err := exists(logDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if !ok {
+		fmt.Println("[>] Creating log directory with correct access right")
+		out, err := exec.Command("/bin/sh", "-c", "sudo mkdir -p "+logDir).Output()
+		if len(out) != 0 {
+			fmt.Print(out)
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("[+] Directory created")
+	} else {
+		fmt.Println("[>] Directory already exists")
+	}
+	fmt.Println("[>] Update access right of the directory to current user")
+	out, err := exec.Command("/bin/sh", "-c", "sudo chown -R "+user+": "+logDir).Output()
+	if len(out) != 0 {
+		fmt.Print(out)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func installTranslations() {
+	user := os.Getenv("USER")
+	fmt.Println("[>] Installing translations")
+	fmt.Println("[>] Checking for existing translations directory")
+	ok, err := exists(translationsDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if !ok {
+		fmt.Println("[>] Creating translations directory with correct access right")
+		out, err := exec.Command("/bin/sh", "-c", "sudo mkdir -p "+translationsDir).Output()
+		if len(out) != 0 {
+			fmt.Print(out)
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("[+] Directory created")
+	} else {
+		fmt.Println("[>] Directory already exists")
+	}
+	fmt.Println("[>] Update access right of the directory to current user")
+	out, err := exec.Command("/bin/sh", "-c", "sudo chown -R "+user+": "+secureGateLibDir).Output()
+	if len(out) != 0 {
+		fmt.Print(out)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("[+] Directory updated")
+	fmt.Println("[>] Update translations")
+	out, err = exec.Command("/bin/sh", "-c", "sudo cp -R "+translations+"* "+translationsDir).Output()
+	if len(out) != 0 {
+		fmt.Print(out)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("[+] Translations updated")
 }

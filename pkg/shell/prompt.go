@@ -39,6 +39,7 @@ func NewSecureGatePrompt(sess *session.SecureGateSession) *SecureGatePrompt {
 		),
 		readline.PcItem("list"),
 		readline.PcItem("me"),
+		readline.PcItem("logout"),
 		readline.PcItem("exit"),
 	)
 
@@ -54,7 +55,9 @@ func NewSecureGatePrompt(sess *session.SecureGateSession) *SecureGatePrompt {
 	return &SecureGatePrompt{prompt}
 }
 
-// Readline reads the current input and override the prompt if one given.
+// Readline override the prompt if one given,
+// reads the current input and return it or an error
+// if it finds EOF or if the user sent a SIGINT signal.
 func (p *SecureGatePrompt) Readline(prompt string) (string, error) {
 	if prompt != "" {
 		oldPrompt := p.prompt.Config.Prompt
@@ -64,7 +67,9 @@ func (p *SecureGatePrompt) Readline(prompt string) (string, error) {
 	return p.prompt.Readline()
 }
 
-// ReadPassword reads the input in no echo mode.
+// ReadPassword display the given prompt, reads the input
+// in no echo mode and return it or an error if if finds EOF
+// or if the user sent a SIGINT signal.
 func (p *SecureGatePrompt) ReadPassword(prompt string) (string, error) {
 	b, err := p.prompt.ReadPassword(prompt)
 	password := string(b)

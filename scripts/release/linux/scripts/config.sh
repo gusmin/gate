@@ -12,6 +12,13 @@ GATE_USERNAME="secure"
 CONFIG_DEST_DIR="/etc/securegate/gate"
 CONFIG_FILE_NAME="config.json"
 
+# Translations
+TRANSLATIONS_TAR="translations.tgz"
+TRANSLATIONS_DEST="/var/lib/securegate/gate/"
+
+# Log
+LOG_FOLDER
+
 # Binary
 BIN_NAME="securegate-gate"
 BIN_DEST="/usr/bin"

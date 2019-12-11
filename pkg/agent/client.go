@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/pkg/errors"
-	"golang.org/x/net/context/ctxhttp"
 )
 
 // Client is a REST client interacting with Secure Gate agents.
@@ -37,16 +37,16 @@ type SSHAuthResponse struct {
 	Message   string `json:"Message"`
 }
 
-// AddSSHPublicKey adds the public SSH key to the authorized_keys file
+// AddAuthorizedKey add the public SSH key to the authorized_keys file
 // located on the agent running at the given endpoint for the given user id.
-func (c Client) AddSSHPublicKey(ctx context.Context, endpoint, id string, key []byte) (SSHAuthResponse, error) {
+func (c Client) AddAuthorizedKey(ctx context.Context, endpoint, id string, key []byte) (SSHAuthResponse, error) {
 	// marshal the key as json body
-	body, err := json.Marshal(map[string]interface{}{"publicKey": string(key)})
+	body, err := json.Marshal(map[string]interface{}{"publicKey": strings.TrimSpace(string(key))})
 	if err != nil {
 		return SSHAuthResponse{}, errors.Wrap(err, "could not create body for ssh-authorization request")
 	}
 
-	req, err := makeAddSSHPublicKeyRequest(endpoint, id, c.authToken, bytes.NewBuffer(body))
+	req, err := makeAddPublicSSHKeyRequest(endpoint, id, c.authToken, bytes.NewBuffer(body))
 	if err != nil {
 		return SSHAuthResponse{}, err
 	}
@@ -59,7 +59,7 @@ func (c Client) AddSSHPublicKey(ctx context.Context, endpoint, id string, key []
 	return resp, nil
 }
 
-func makeAddSSHPublicKeyRequest(endpoint, id, token string, body io.Reader) (*http.Request, error) {
+func makeAddPublicSSHKeyRequest(endpoint, id, token string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(http.MethodPost, endpoint+"/gate/users/"+id+"/ssh-authorization", body)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create ssh-authorization request")
@@ -70,11 +70,11 @@ func makeAddSSHPublicKeyRequest(endpoint, id, token string, body io.Reader) (*ht
 	return req, nil
 }
 
-// DeleteSSHPublicKey deletes the public SSH key from the authorized_keys file
+// DeleteAuthorizedKey deletes the public SSH key from the authorized_keys file
 // located on the agent running at the given endpoint for the given user id.
-func (c Client) DeleteSSHPublicKey(ctx context.Context, endpoint, id string, key []byte) (SSHAuthResponse, error) {
+func (c Client) DeleteAuthorizedKey(ctx context.Context, endpoint, id string, key []byte) (SSHAuthResponse, error) {
 	// marshal the key as json body
-	body, err := json.Marshal(map[string]interface{}{"publicKey": string(key)})
+	body, err := json.Marshal(map[string]interface{}{"publicKey": strings.TrimSpace(string(key))})
 	if err != nil {
 		return SSHAuthResponse{}, errors.Wrap(err, "could not create body for ssh-authorization request")
 	}
@@ -104,7 +104,7 @@ func makeDeleteSSHPublicKeyRequest(endpoint, id, token string, body io.Reader) (
 }
 
 func (c Client) do(ctx context.Context, req *http.Request, resp interface{}) error {
-	httpResp, err := ctxhttp.Do(ctx, c.httpClient, req)
+	httpResp, err := c.httpClient.Do(req.WithContext(ctx))
 	if err != nil {
 		return err
 	}

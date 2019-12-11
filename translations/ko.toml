@@ -45,3 +45,6 @@ other = "가도 된 서버들의 정보들을 나열하기"
 
 [MeShortDesc]
 other = "사용자의 정보들을 표시하기"
+
+[LogoutShortDesc]
+other = "세션에서 사용자가 로그아웃하기"

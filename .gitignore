@@ -1,0 +1,9 @@
+# Releases
+securegate-gate-*
+translations.tgz
+
+# Configuration
+config.json
+
+# Database
+*.db

@@ -1,5 +1,8 @@
 {
-  "backend_uri": "http://localhost:3000/graphql",
-  "ssh_user": "gateuser"
-  "agent_authentication_token": ""
+  "backend_uri": "http://securegate:3000/graphql",
+  "ssh_user": "gateuser",
+  "agent_authentication_token": "",
+  "language": "en",
+  "mongo_uri": "mongodb://localhost:27017/",
+  "mongo_db_name": "securegate"
 }

@@ -22,29 +22,29 @@ func exist(path string) bool {
 }
 
 // generateSSHKeyPair generate a pair of SSH key(public, private) in the specified paths.
-func generateSSHKeyPair(pubKeyPath, privateKeyPath string) ([]byte, error) {
+func generateSSHKeyPair(pubKeyPath, privateKeyPath string) error {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 1024)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// generate and write private key as PEM
 	privateKeyFile, err := os.OpenFile(privateKeyPath, os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer privateKeyFile.Close()
 	privateKeyPEM := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privateKey)}
 	if err = pem.Encode(privateKeyFile, privateKeyPEM); err != nil {
-		return nil, err
+		return err
 	}
 
 	// generate and write public key
 	pub, err := ssh.NewPublicKey(&privateKey.PublicKey)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	key := ssh.MarshalAuthorizedKey(pub)
 
-	return key, ioutil.WriteFile(pubKeyPath, key, 0655)
+	return ioutil.WriteFile(pubKeyPath, key, 0655)
 }

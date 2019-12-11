@@ -3,6 +3,7 @@
 ID=$(which id)
 CP=$(which cp)
 CAT=$(which cat)
+TAR=$(which tar)
 CHSH=$(which chsh)
 CHOWN=$(which chown)
 MKDIR=$(which mkdir)
@@ -60,6 +61,12 @@ function launch_install() {
     echo "Copy config"
     sudo ${MKDIR} -p ${CONFIG_DEST_DIR}
     sudo ${CP} ${CONFIG_FILE_NAME} ${CONFIG_DEST_DIR}
+    echo "Create log folder"
+    sudo ${MKDIR} -p ${LOG_FOLDER}
+    sudo ${CHOWN} -R ${USER}: ${LOG_FOLDER}
+    echo "Create translation folder"
+    sudo ${MKDIR} -p ${TRANSLATIONS_DEST}
+    sudo ${TAR} -zxf ${TRANSLATIONS_TAR} -C ${TRANSLATIONS_DEST}
     echo "Change the default shell of ${GATE_USERNAME} to ${BIN_NAME}"
     sudo ${CHSH} -s ${BIN_DEST}/${BIN_NAME} ${GATE_USERNAME}
     set +e

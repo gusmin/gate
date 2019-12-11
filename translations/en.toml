@@ -1,5 +1,5 @@
 [Hello]
-other = "Hi {{.Firstname}} {{.Lastname}} ! Sup ?"
+other = "Hi {{.Firstname}} {{.Lastname}}! Sup?"
 
 [Goodbye]
 other = "See ya next time {{.Firstname}} {{.Lastname}}..."
@@ -45,3 +45,6 @@ other = "List available machines informations"
 
 [MeShortDesc]
 other = "Display user informations"
+
+[LogoutShortDesc]
+other = "Log out the user from the current session"

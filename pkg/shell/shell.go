@@ -7,29 +7,26 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Prompt is the interface that wraps the Readline and ReadPassword methods.
-//
-// Readline return the user input or and error.
-// ReadlinePasswords set the terminal in no echo mode and prompt the user for password.
+// Prompt reads input from a user.
 type Prompt interface {
+	// Readline return the user input or and error.
 	Readline(prompt string) (string, error)
+	// ReadlinePasswords set the terminal in no echo mode and prompt the user for password.
 	ReadPassword(prompt string) (string, error)
 }
 
-// Command is the interface that wraps Execute method.
-//
-// Execute executes the command line and return an error in case of failure.
+// Command is an executable command tree.
 type Command interface {
+	// Execute executes the command line and return an error in case of failure.
 	Execute(cmd string) error
 }
 
 // SecureGateShell is the interactive CLI application of Secure Gate.
 // It is a prompt using the Secure Gate completer
 type SecureGateShell struct {
-	// contains filtered or unexported fields
-	prompt  Prompt
-	command Command
-	sess    *session.SecureGateSession
+	Prompt  Prompt
+	Command Command
+	Sess    *session.SecureGateSession
 }
 
 // New instanciates a new SecureGateShell which executes
@@ -37,9 +34,9 @@ type SecureGateShell struct {
 // SecureGateSession to enhance the completion (e.g. connect command completion).
 func New(prompt Prompt, command Command, sess *session.SecureGateSession) *SecureGateShell {
 	return &SecureGateShell{
-		prompt:  prompt,
-		command: command,
-		sess:    sess,
+		Prompt:  prompt,
+		Command: command,
+		Sess:    sess,
 	}
 }
 
@@ -51,33 +48,33 @@ mainLoop:
 		if err != nil {
 			return err
 		}
-		err = sh.sess.SignUp(email, password)
+		err = sh.Sess.SignUp(email, password)
 		if err != nil {
-			sh.sess.Logger.Errorf("%v\n", err)
+			sh.Sess.Logger.Errorf("%v\n", err)
 			continue mainLoop
 		}
 
 	inputLoop:
-		for {
-			cmd, err := sh.prompt.Readline("")
+		for sh.Sess.LoggedIn() == true {
+			cmd, err := sh.Prompt.Readline("")
 			if err != nil {
 				switch err {
 				case io.EOF:
 					// Sign out the user if the input loop is broken
-					sh.sess.SignOut()
+					sh.Sess.SignOut()
 					break inputLoop
 				default:
-					continue
+					continue inputLoop
 				}
 			}
-			sh.sess.Logger.WithFields(session.Fields{
-				"user": sh.sess.User().ID,
+			sh.Sess.Logger.WithFields(session.Fields{
+				"user": sh.Sess.User().ID,
 			}).Warnf("%v\n", cmd)
 
-			err = sh.command.Execute(cmd)
+			err = sh.Command.Execute(cmd)
 			if err != nil {
-				sh.sess.Logger.WithFields(session.Fields{
-					"user": sh.sess.User().ID,
+				sh.Sess.Logger.WithFields(session.Fields{
+					"user": sh.Sess.User().ID,
 				}).Errorf("%v\n", err)
 			}
 		}
@@ -86,13 +83,13 @@ mainLoop:
 
 // askForCredentials prompt the user to input his email and password.
 func (sh *SecureGateShell) askForCredentials() (email, password string, err error) {
-	email, err = sh.prompt.Readline("Email: ")
+	email, err = sh.Prompt.Readline("Email: ")
 	if err != nil {
 		err = errors.Wrap(err, "could not read email")
 		return
 	}
 
-	b, err := sh.prompt.ReadPassword("Password: ")
+	b, err := sh.Prompt.ReadPassword("Password: ")
 	password = string(b)
 	if err != nil {
 		err = errors.Wrap(err, "could not read password")

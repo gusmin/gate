@@ -45,3 +45,6 @@ other = "Liste les informations de chaques machines accessibles"
 
 [MeShortDesc]
 other = "Affiche les informations de l'utilisateur"
+
+[LogoutShortDesc]
+other = "Deconnecte l'utilisateur de la session"

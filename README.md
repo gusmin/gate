@@ -1,105 +1,109 @@
-# Secure Gate - Gate
+# Secure Gate - Gate <img src="https://media.discordapp.net/attachments/433311912281767978/626863798610821130/logo_400dpi.png?width=764&height=884" width=60>
 
+[![Built with Mage](https://magefile.org/badge.svg)](https://magefile.org)
 [![Build Status](https://travis-ci.com/gusmin/gate.svg?token=6WEq9jpFesV2iXzoQsy4&branch=master)](https://travis-ci.com/gusmin/gate)
 
-The gate is an essential part of the project "Secure Gate".
+**Gate** is an essential part of the **Secure Gate** project.
 
-It's the interface used between the user and the other agents.
+For more informations about other parts check out these repositories:
 
-This project is developped with [Golang](https://golang.org/)
-(go minimum version is 1.12)
+- [Backend](https://github.com/atrahy/backend)
+- [Frontend](https://github.com/atrahy/frontend)
+- [Agent](https://github.com/atrahy/agent)
 
-## Install from release
+**Gate** is the interface used between users and [agents](https://github.com/atrahy/agent).
 
-### Get sources
+*This project is developped with Go
+(1.12+)*
 
-- From release tarbar  
-  [Releases](https://github.com/gusmin/gate/releases)
-- From repository
+## :cd: Installation
 
-  ```shell
-  $ export GOPATH="${HOME}/go"
-  $ export PATH="${PATH}:${GOPATH}/bin"
-  $ go get -u github.com/magefile/mage
-  $ mage -v release:linux
-  $ cd release/securegate-gate-{version}
-  ````
+### From a release
 
-### Configuration
+1. **Get a release of the project**. There are various way to achieve this.
 
-Copy the `config.json.template` to `config.json`
-File `config.json`:
+    - Get it from a [releases tarball](https://github.com/gusmin/gate/releases)
+    - Package it directly from the repository:
 
-- `backend_uri` -> `String`: uri of the graphql endpoint of the backend
-- `ssh_user` -> `String`: user that will be used for the ssh connections
+        ```Shell
+        $ go get -u github.com/magefile/mage
+        $ mage release:linux
+        ```
 
-### Install
+2. **Set up the configuration.**
+  
+    `cp` the `config.json.template` as `config.json` and edit it according to your needs.
 
-Run `./install` script
+    |           Setting          |                      Description                     |  Value |
+    |:--------------------------:|:----------------------------------------------------:|:------:|
+    |         **backend_uri**        |          URI of your running backend server          | string |
+    |          **ssh_user**          |                 SSH user used for al                 | string |
+    | **agent_authentication_token** | Bearer token used for authentication on agent's side | string |
+    |          **language**          |              Language of the application             | string |
+    |        **db_path**       |             Path of your database            | string |
 
-The script:
+3. **Install the Gate**
 
-- create the `secure` user
-- install the binary to `/usr/bin`
-- set the default shell of `secure` to `/usr/bin/securegate-gate`
+    Go to the previously created release directory and **run the installation script**.
 
-## Installation local
+    ```Shell
+    $ cd release/securegate-gate-{version}
+    $ ./install
+    ```
 
-At first set your environment:
+    This installation script will do **EVERYTHING** for you and set up the **Gate** :rainbow:
 
-```bash
-export GOPATH="${HOME}/go"
-export PATH="${PATH}:${GOPATH}/bin"
-```
+    - It creates a new user: `secure`
+    - Installs the binary `securegate-gate` in `/usr/bin/`
+    - Installs your custom configuration
+    - Makes a special directory to store your logs in `/var/log/securegate/gate/`
+    - Installs the available translations in case you need to change the langage later on.
 
-Then install mage:
+        *Available languages are English, French and Korean*
+    - Set the default shell of the user `secure` to `/usr/bin/securegate-gate`
 
-```shell
-$ go get -u github.com/magefile/mage
-```
+### :crystal_ball: All with Mage
 
-Install the gate by running this command in your terminal:
+1. If you don't have [Mage](https://magefile.org) already installed (shame on you) **install it**
 
-```$shell
-$ mage -v install
-```
+    ```Shell
+    $ go get -u github.com/magefile/mage
+    ```
 
-If you want to run unit tests as well as some linters(golint, go vet) you can run this additional command:
+2. Install the **Gate** by **running this command** in your terminal
 
-```shell
-$ mage -v check
-```
+    ```
+    $ mage install
+    ```
 
-## Usage
+## :milky_way: Welcome in the Gate
 
-The gate will first ask you some credentials. These are the ones you used for signing in to Secure Gate:
+:tada: **Congrats you finished to install the Gate ! Now let's get in !**
 
-```shell
-$ gate
-Email: xxxx
-Password:
-Authentication successful
-securegate$
-```
+In the first place you'll have to **sign up** with on your **Secure Gate** account.
 
-### Available ommands
+*The credentials are the ones you used during your sign in on the [Frontend](https://github.com/atrahy/frontend)*.
+
+### :computer: Commands
 
 ```console
-help                ##Help about any command
+help                ## Help about any command
 me                  ## Display informations about the current user
-add                 ## Add something
-list                ## List all available machines
+list                ## List all accessible nodes
 connect             ## Open SSH connection to a machine
 logout              ## Terminate the session
 exit                ## Close the shell
 ```
 
-#### - help
+#### :books: Help
 
-Provides informations about the available commands.
-Type wether `help [command]` or `[command] --help` for full details.
+##### Provides informations about the available commands
 
-```shell
+*Althought every commands have their own help option.*
+
+*e.g. `[command] --help`*
+
+```
 securegate$ help
 Secure Gate makes the connection between computers more secure than ever
 
@@ -107,78 +111,65 @@ Usage:
   [command]
 
 Available Commands:
-  add       Add object
-  connect   Open SSH connection to a machine
+  connect     Open SSH connection to a machine
+  machine     List all accessible nodes
   ...
   ...
 
 Use "[command] --help" for more information about this command
 ```
 
-#### - me
+#### :ok_woman: Me
 
-Display all informations about the current user:
+##### Display informations related to the current user
 
-- Email
-- Firstname
-- Lastname
-- Job
-- ...
-
-```shell
+```
 securegate$ me
-Email: test@random.com
-Firstname: Jean
-Lastname: Martin
-Job: dev
++--------+-----------+----------+------------+
+| EMAIL  | FIRSTNAME | LASTNAME |     JOB    |
++--------+-----------+----------+------------+
+| Secure | Gate      | Is       | Wonderfull |
++--------+-----------+----------+------------+
+You.
 ```
 
-#### - add [command]
+#### :electric_plug: Connect
 
-Add something(would be better if you try to add something that we can add)
+##### Open a SSH connection toward the machine given as argument
 
-Available things:
-
-- `machine [name] [ip] [port]`
-
-  ```shell
-  securegate$ add machine foobar 127.0.0.1 3000
-  Machine foobar successfully added
-  securegate$ list
-  [foobar] => 127.0.0.1:300
-  ```
-
-#### - connect [machine]
-
-Create a ssh connection to the given machine(must obviously be an available machine for the user)
-
-```shell
-securegate$ connect foobar
-dummy@foobar-pc:~$
+```Shell
+securegate$ connect nowhere
+dummy@nowhere-pc:~$
 ```
 
-#### - list
+#### :scroll: List
 
-List all the machines available for the current user
+##### List all the accessible machines by the current user
 
-```shell
+```
 securegate$ list
-[foo] => 127.0.0.1:3000
-[bar] => 127.0.0.2:3000
++------------------+----------+-------------------------------------------------------+-------+
+|        ID        |   NAME   |                          IP                           | PORT  |
++------------------+----------+-------------------------------------------------------+-------+
+| 09gtWjWi9SOVSGb1 | NASA     | localhost                                             |  3002 |
+| VexuCBYu0JOHzy84 | AREA-51  | localhost                                             | 62774 |
+| kKQSHWF2cl1pjZdp | nowhere  | localhost                                             |  3002 |
++------------------+----------+-------------------------------------------------------+-------+
+Available nodes.
 ```
 
-#### - logout
+#### :walking: Logout
 
-Terminate the active session.
+##### Terminate the active session
 
-```shell
+```
 securegate$ logout
 Email:
 ```
 
-#### - exit
+#### :running: Exit
 
-Close the shell with the given exit status(0 by default)
+##### Close the shell with the given exit status (0 by default)
 
 ```shell
 securegate$ exit 42

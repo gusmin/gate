@@ -16,22 +16,30 @@ type Configuration struct {
 	AgentAuthToken string `mapstructure:"agent_authentication_token"`
 	SSHUser        string `mapstructure:"ssh_user"`
 	Language       string `mapstructure:"language"`
+	DBPath         string `mapstructure:"db_path"`
 }
 
 // FromFile load the configuration from the given file.
 func FromFile(filename string) (Configuration, error) {
 	v := viper.New()
+	setDefaults(v)
 
 	v.SetConfigName(filename)
 	v.AddConfigPath(configPath)
 	if err := v.ReadInConfig(); err != nil {
 		return Configuration{}, errors.Wrapf(err, "%s could not be loaded", filename)
 	}
+
 	var cfg Configuration
-	if err := v.Unmarshal(&cfg); err != nil {
+	if err := v.UnmarshalExact(&cfg); err != nil {
 		return Configuration{}, errors.Wrapf(err, "%s could not be loaded", filename)
 	}
 	return cfg, nil
+}
+
+func setDefaults(v *viper.Viper) {
+	v.SetDefault("language", "en")
+	v.SetDefault("db_path", "/var/lib/securegate/gate/securegate.db")
 }
 
 // Debug prints the given configuration struct.

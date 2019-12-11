@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"os"
 	"path"
-	"strconv"
 
 	"github.com/gusmin/gate/pkg/backend"
 	"github.com/gusmin/gate/pkg/session"
@@ -25,7 +23,7 @@ func newConnectCommand(sess *session.SecureGateSession) *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			sshUser := sess.SSHUser()
+			sshUser := sess.SSHUser
 			currentUser := sess.User()
 			machineName := args[0]
 
@@ -37,7 +35,7 @@ func newConnectCommand(sess *session.SecureGateSession) *cobra.Command {
 				}
 			}
 			if (backend.Machine{}) == machine {
-				return fmt.Errorf(machineName, "%s is not part of accessible machines")
+				return fmt.Errorf("%s is not part of accessible machines", machineName)
 			}
 
 			// Setup the config
@@ -55,8 +53,8 @@ func newConnectCommand(sess *session.SecureGateSession) *cobra.Command {
 			}
 
 			// Dial the server
-			// conn, err := ssh.Dial("tcp", machine.IP+":22", config)
-			conn, err := ssh.Dial("tcp", net.JoinHostPort(machine.IP, strconv.Itoa(machine.AgentPort)), config)
+			conn, err := ssh.Dial("tcp", machine.IP+":22", config)
+			// conn, err := ssh.Dial("tcp", net.JoinHostPort(machine.IP, strconv.Itoa(machine.AgentPort)), config)
 			if err != nil {
 				return errors.Wrapf(err, "failed to dial with %s", machineName)
 			}

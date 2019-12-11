@@ -8,9 +8,9 @@ import (
 
 // userInfos are the logged in user related informations.
 type userInfos struct {
-	pubKey   []byte
-	user     safeUser     // accessed during background polling
-	machines safeMachines // accessed during background polling
+	pubKey   []byte       // initialized in loadSSHPublickey
+	user     safeUser     // updated during background polling
+	machines safeMachines // updated during background polling
 }
 
 type safeMachines struct {
