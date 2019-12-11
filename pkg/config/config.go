@@ -39,7 +39,7 @@ func FromFile(filename string) (Configuration, error) {
 
 func setDefaults(v *viper.Viper) {
 	v.SetDefault("language", "en")
-	v.SetDefault("db_path", "/var/lib/securegate/gate/securegate.db")
+	v.SetDefault("db_path", "/var/lib/securegate/gate")
 }
 
 // Debug prints the given configuration struct.
