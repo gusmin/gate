@@ -67,7 +67,7 @@ For more informations about Secure Gate check out our other repositories:
 
 ### :crystal_ball: All with Mage
 
-1. If you don't have [Mage](https://magefile.org) already installed (shame on you) **install it**
+1. If you don't have [Mage](https://magefile.org) already installed **install it**
 
     ```Shell
     $ go get -u github.com/magefile/mage
