@@ -65,7 +65,7 @@ For more informations about other parts check out these repositories:
 
 ### :crystal_ball: All with Mage
 
-1. If you don't have [Mage](https://magefile.org) already installed (shame on you) **install it**
+1. If you don't have [Mage](https://magefile.org) already installed **install it**
 
     ```Shell
     $ go get -u github.com/magefile/mage
@@ -81,7 +81,7 @@ For more informations about other parts check out these repositories:
 
 :tada: **Congrats you finished to install the Gate ! Now let's get in !**
 
-In the first place you'll have to **sign up** with on your **Secure Gate** account.
+In the first place you'll have to **sign up** with your **Secure Gate** account.
 
 *The credentials are the ones you used during your sign in on the [Frontend](https://github.com/atrahy/frontend)*.
 
