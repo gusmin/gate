@@ -1,27 +1,29 @@
-# Secure Gate - Gate <img src="https://media.discordapp.net/attachments/433311912281767978/626863798610821130/logo_400dpi.png?width=764&height=884" width=60>
+# Gate
 
 [![GoDoc](https://godoc.org/github.com/gusmin/gate/pkg?status.svg)](https://godoc.org/github.com/gusmin/gate/pkg)
 [![Build Status](https://travis-ci.com/gusmin/gate.svg?token=6WEq9jpFesV2iXzoQsy4&branch=master)](https://travis-ci.com/gusmin/gate)
 [![Built with Mage](https://magefile.org/badge.svg)](https://magefile.org)
 
-**Gate** is an essential part of the **Secure Gate** project.
+<img src="https://media.discordapp.net/attachments/433311912281767978/626863798610821130/logo_400dpi.png?width=764&height=884" width=60>
 
-For more informations about other parts check out these repositories:
+***
+
+Gate is an essential part of the opensource project Secure Gate.
+It is an interactive CLI used as an interface between users and [agents](https://github.com/atrahy/agent) in order to secure access permissions within your machines stack.
+
+For more informations about Secure Gate check out our other repositories:
 
 - [Backend](https://github.com/atrahy/backend)
 - [Frontend](https://github.com/atrahy/frontend)
 - [Agent](https://github.com/atrahy/agent)
 
-**Gate** is the interface used between users and [agents](https://github.com/atrahy/agent).
-
-*This project is developped with Go
-(1.12+)*
+***
 
 ## :cd: Installation
 
 ### From a release
 
-1. **Get a release of the project**. There are various way to achieve this.
+1. Get a release of the project. There are various way to achieve this.
 
     - Get it from a [releases tarball](https://github.com/gusmin/gate/releases)
     - Package it directly from the repository:
@@ -31,19 +33,19 @@ For more informations about other parts check out these repositories:
         $ mage release:linux
         ```
 
-2. **Set up the configuration.**
+2. Set up the configuration.
   
     `cp` the `config.json.template` as `config.json` and edit it according to your needs.
 
     |           Setting          |                      Description                     |  Value |
     |:--------------------------:|:----------------------------------------------------:|:------:|
-    |         **backend_uri**        |          URI of your running backend server          | string |
-    |          **ssh_user**          |                 SSH user used for al                 | string |
-    | **agent_authentication_token** | Bearer token used for authentication on agent's side | string |
-    |          **language**          |              Language of the application             | string |
-    |        **db_path**       |             Path of your database            | string |
+    |         backend_uri        |          URI of your running backend server          | string |
+    |          ssh_user          |                 SSH user used for al                 | string |
+    | agent_authentication_token | Bearer token used for authentication on agent's side | string |
+    |          language          |              Language of the application             | string |
+    |        db_path       |             Path of your database            | string |
 
-3. **Install the Gate**
+3. Install the Gate
 
     Go to the previously created release directory and **run the installation script**.
 
@@ -52,7 +54,7 @@ For more informations about other parts check out these repositories:
     $ ./install
     ```
 
-    This installation script will do **EVERYTHING** for you and set up the **Gate** :rainbow:
+    This installation script will do **EVERYTHING** for you and set up the Gate :rainbow:
 
     - It creates a new user: `secure`
     - Installs the binary `securegate-gate` in `/usr/bin/`
@@ -71,7 +73,7 @@ For more informations about other parts check out these repositories:
     $ go get -u github.com/magefile/mage
     ```
 
-2. Install the **Gate** by **running this command** in your terminal
+2. Install the Gate by running this command in your terminal
 
     ```
     $ mage install
@@ -79,9 +81,9 @@ For more informations about other parts check out these repositories:
 
 ## :milky_way: Welcome in the Gate
 
-:tada: **Congrats you finished to install the Gate ! Now let's get in !**
+**Congrats you finished to install the Gate ! Now let's get in !** :tada:
 
-In the first place you'll have to **sign up** with on your **Secure Gate** account.
+In the first place you'll have to sign up with on your Secure Gate account.
 
 *The credentials are the ones you used during your sign in on the [Frontend](https://github.com/atrahy/frontend)*.
 
