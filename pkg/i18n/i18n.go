@@ -16,7 +16,7 @@ type Translator struct {
 }
 
 // NewTranslatorFromFile returns a new Translator translating message
-// to lang based on `.toml` translation files located in the translationsPath.
+// to lang based on .toml translation files located in the translationsPath.
 func NewTranslatorFromFile(lang, translationsPath string) *Translator {
 	bndl := i18n.NewBundle(language.English)
 	bndl.RegisterUnmarshalFunc("toml", toml.Unmarshal)

@@ -16,7 +16,7 @@ const (
 
 // SecureGateBoltRepository is a database repository interacting
 // with a key/value embedded and lightweight database
-// called [Bolt](https://github.com/boltdb/bolt).
+// called Bolt(https://github.com/boltdb/bolt).
 type SecureGateBoltRepository struct {
 	// database directory
 	Path string
