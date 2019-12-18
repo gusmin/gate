@@ -1,8 +1,8 @@
 [Hello]
-other = "Hi {{.Firstname}} {{.Lastname}}! Sup?"
+other = "Hi %s %s! Sup?\n"
 
 [Goodbye]
-other = "See ya next time {{.Firstname}} {{.Lastname}}..."
+other = "See ya next time %s %s...\n"
 
 [ID]
 other = "ID"

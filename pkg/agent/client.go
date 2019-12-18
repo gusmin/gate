@@ -1,9 +1,11 @@
+// Package agent contains a client for the Secure Gate agents API.
 package agent
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -19,11 +21,12 @@ type Client struct {
 }
 
 // NewClient creates a new Secure Gate agent client with the given authorization token
-// and a http.DefaultClient if none given.
+// and httpClient. http.DefaultClient is used as HTTP client if none given.
 func NewClient(authToken string, httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
+
 	return &Client{
 		httpClient: httpClient,
 		authToken:  authToken,
@@ -40,13 +43,13 @@ type SSHAuthResponse struct {
 // AddAuthorizedKey add the public SSH key to the authorized_keys file
 // located on the agent running at the given endpoint for the given user id.
 func (c Client) AddAuthorizedKey(ctx context.Context, endpoint, id string, key []byte) (SSHAuthResponse, error) {
-	// marshal the key as json body
+	// Marshal the key as json body.
 	body, err := json.Marshal(map[string]interface{}{"publicKey": strings.TrimSpace(string(key))})
 	if err != nil {
-		return SSHAuthResponse{}, errors.Wrap(err, "could not create body for ssh-authorization request")
+		return SSHAuthResponse{}, errors.Wrap(err, "could not create body for ssh-authorization POST request")
 	}
 
-	req, err := makeAddPublicSSHKeyRequest(endpoint, id, c.authToken, bytes.NewBuffer(body))
+	req, err := makeAddAuthorizedKeyRequest(endpoint, id, c.authToken, bytes.NewBuffer(body))
 	if err != nil {
 		return SSHAuthResponse{}, err
 	}
@@ -54,15 +57,15 @@ func (c Client) AddAuthorizedKey(ctx context.Context, endpoint, id string, key [
 	var resp SSHAuthResponse
 	err = c.do(ctx, req, &resp)
 	if err != nil {
-		return SSHAuthResponse{}, errors.Wrap(err, "ssh-authorization request failed")
+		return SSHAuthResponse{}, errors.Wrap(err, "ssh-authorization POST request failed")
 	}
 	return resp, nil
 }
 
-func makeAddPublicSSHKeyRequest(endpoint, id, token string, body io.Reader) (*http.Request, error) {
+func makeAddAuthorizedKeyRequest(endpoint, id, token string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(http.MethodPost, endpoint+"/gate/users/"+id+"/ssh-authorization", body)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not create ssh-authorization request")
+		return nil, errors.Wrap(err, "could not create ssh-authorization POST request")
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Accept", "application/json")
@@ -73,10 +76,10 @@ func makeAddPublicSSHKeyRequest(endpoint, id, token string, body io.Reader) (*ht
 // DeleteAuthorizedKey deletes the public SSH key from the authorized_keys file
 // located on the agent running at the given endpoint for the given user id.
 func (c Client) DeleteAuthorizedKey(ctx context.Context, endpoint, id string, key []byte) (SSHAuthResponse, error) {
-	// marshal the key as json body
+	// Marshal the key as json body.
 	body, err := json.Marshal(map[string]interface{}{"publicKey": strings.TrimSpace(string(key))})
 	if err != nil {
-		return SSHAuthResponse{}, errors.Wrap(err, "could not create body for ssh-authorization request")
+		return SSHAuthResponse{}, errors.Wrap(err, "could not create body for ssh-authorization DELETE request")
 	}
 
 	req, err := makeDeleteSSHPublicKeyRequest(endpoint, id, c.authToken, bytes.NewBuffer(body))
@@ -87,7 +90,7 @@ func (c Client) DeleteAuthorizedKey(ctx context.Context, endpoint, id string, ke
 	var resp SSHAuthResponse
 	err = c.do(ctx, req, &resp)
 	if err != nil {
-		return SSHAuthResponse{}, errors.Wrap(err, "ssh-authorization request failed")
+		return SSHAuthResponse{}, errors.Wrap(err, "ssh-authorization DELETE request failed")
 	}
 	return resp, nil
 }
@@ -95,7 +98,7 @@ func (c Client) DeleteAuthorizedKey(ctx context.Context, endpoint, id string, ke
 func makeDeleteSSHPublicKeyRequest(endpoint, id, token string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(http.MethodDelete, endpoint+"/gate/users/"+id+"/ssh-authorization", body)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not create ssh-authorization request")
+		return nil, errors.Wrap(err, "could not create ssh-authorization DELETE request")
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Accept", "application/json")
@@ -109,6 +112,10 @@ func (c Client) do(ctx context.Context, req *http.Request, resp interface{}) err
 		return err
 	}
 	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode != http.StatusOK {
+		return fmt.Errorf("request status code is not 200: %d", httpResp.StatusCode)
+	}
 
 	err = json.NewDecoder(httpResp.Body).Decode(&resp)
 	if err != nil {

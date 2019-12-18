@@ -1,14 +1,15 @@
 package shell
 
 import (
-	"log"
+	"io"
 
 	"github.com/chzyer/readline"
-	"github.com/gusmin/gate/pkg/session"
+	"github.com/gusmin/gate/pkg/core"
+	"github.com/pkg/errors"
 )
 
-// secureGatePrompt is the prompt shown in Secure Gate shell.
-const securegatePrompt = "\033[36;1;1msecuregate$\033[0m "
+// secureGatePrompt is the default prompt shown in Secure Gate shell.
+var securegatePrompt = "\033[36;1;1msecuregate$\033[0m "
 
 // SecureGatePrompt is the default prompt for Secure Gate.
 type SecureGatePrompt struct {
@@ -17,12 +18,13 @@ type SecureGatePrompt struct {
 }
 
 // makeConnectCommandCompleter returns a function which is used
-// to make dynamic completion with accessible nodes for the connect command.
-func makeConnectCommandCompleter(sess *session.SecureGateSession) readline.DynamicCompleteFunc {
+// to make dynamic completion on connect command with accessible nodes
+// of the current user.
+func makeConnectCommandCompleter(core *core.SecureGateCore) readline.DynamicCompleteFunc {
 	return func(line string) []string {
 		var machineNames []string
 
-		for _, m := range sess.Machines() {
+		for _, m := range core.Machines() {
 			machineNames = append(machineNames, m.Name)
 		}
 
@@ -30,12 +32,12 @@ func makeConnectCommandCompleter(sess *session.SecureGateSession) readline.Dynam
 	}
 }
 
-// NewSecureGatePrompt instanciates a prompt for a Secure Gate shell
-// with the appropriate completer.
-func NewSecureGatePrompt(sess *session.SecureGateSession) *SecureGatePrompt {
+// NewSecureGatePrompt instanciates a prompt reading the given io.ReadCloser
+// with an enhanced completer. The enhancement is based on the given core.
+func NewSecureGatePrompt(in io.ReadCloser, core *core.SecureGateCore) (*SecureGatePrompt, error) {
 	completer := readline.NewPrefixCompleter(
 		readline.PcItem("connect",
-			readline.PcItemDynamic(makeConnectCommandCompleter(sess)),
+			readline.PcItemDynamic(makeConnectCommandCompleter(core)),
 		),
 		readline.PcItem("list"),
 		readline.PcItem("me"),
@@ -48,28 +50,32 @@ func NewSecureGatePrompt(sess *session.SecureGateSession) *SecureGatePrompt {
 		AutoComplete:      completer,
 		InterruptPrompt:   "^C",
 		HistorySearchFold: true,
+		Stdin:             in,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return nil, errors.Wrap(err, "could not instanciate the prompt")
 	}
-	return &SecureGatePrompt{prompt}
+	return &SecureGatePrompt{prompt}, nil
 }
 
-// Readline override the prompt if one given,
-// reads the current input and return it or an error
+// Readline overrides the default prompt if one given,
+// reads the user input and returns it or an error
 // if it finds EOF or if the user sent a SIGINT signal.
 func (p *SecureGatePrompt) Readline(prompt string) (string, error) {
+	// Override the default prompt.
 	if prompt != "" {
 		oldPrompt := p.prompt.Config.Prompt
 		p.prompt.SetPrompt(prompt)
 		defer p.prompt.SetPrompt(oldPrompt)
 	}
+
 	return p.prompt.Readline()
 }
 
-// ReadPassword display the given prompt, reads the input
-// in no echo mode and return it or an error if if finds EOF
-// or if the user sent a SIGINT signal.
+// ReadPassword display the given prompt, reads the user input
+// without echoing and returns it or an error if it finds EOF
+// or if the user sent a SIGINT signal. This is usually the function
+// you need when you want a user to input a password.
 func (p *SecureGatePrompt) ReadPassword(prompt string) (string, error) {
 	b, err := p.prompt.ReadPassword(prompt)
 	password := string(b)

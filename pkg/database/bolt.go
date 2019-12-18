@@ -16,7 +16,7 @@ const (
 
 // SecureGateBoltRepository is a database repository interacting
 // with a key/value embedded and lightweight database
-// called Bolt(https://github.com/boltdb/bolt).
+// called Bolt(Github: https://github.com/boltdb/bolt).
 type SecureGateBoltRepository struct {
 	// database directory
 	Path string
@@ -43,7 +43,7 @@ func (repo *SecureGateBoltRepository) OpenDatabase() error {
 		return err
 	}
 
-	// create the buckets
+	// create the top-level buckets
 	err = db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(usersBucketName))
 		if err != nil {

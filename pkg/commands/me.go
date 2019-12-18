@@ -3,52 +3,56 @@ package commands
 import (
 	"strings"
 
-	"github.com/gusmin/gate/pkg/session"
+	"github.com/gusmin/gate/pkg/backend"
+	"github.com/gusmin/gate/pkg/core"
 	"github.com/olekukonko/tablewriter"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func newMeCommand(sess *session.SecureGateSession) *cobra.Command {
+// newMeCommand creates a new "me" command tied to the given core.
+func newMeCommand(core *core.SecureGateCore) *cobra.Command {
 	return &cobra.Command{
 		Use:   "me",
-		Short: sess.Translator.Translate("MeShortDesc", nil),
-		Long:  sess.Translator.Translate("MeShortDesc", nil),
+		Short: core.Translator.Translate("MeShortDesc"),
+		Long:  core.Translator.Translate("MeShortDesc"),
 		Run: func(cmd *cobra.Command, args []string) {
-			var sb strings.Builder
-
-			// write table into the string.Builder
-			table := tablewriter.NewWriter(&sb)
-			table.SetHeader([]string{
-				sess.Translator.Translate("Email", nil),
-				sess.Translator.Translate("Firstname", nil),
-				sess.Translator.Translate("Lastname", nil),
-				sess.Translator.Translate("Job", nil),
-			})
-			table.SetCaption(true, sess.Translator.Translate("MeCaption", nil))
-
-			// fill the table with existing datas
-			user := sess.User()
-			var row []string
-			if user.Email != "" {
-				row = append(row, user.Email)
-			}
-			if user.FirstName != "" {
-				row = append(row, user.FirstName)
-			}
-			if user.LastName != "" {
-				row = append(row, user.LastName)
-			}
-			if user.Job != "" {
-				row = append(row, user.Job)
-			}
-			table.Append(row)
-
-			// render the table into the string.Builder
-			table.Render()
-
-			sess.Logger.WithFields(session.Fields{
-				"user": user.ID,
-			}).Infof(sb.String())
+			me(core.User(), core.Logger, core.Translator)
 		},
 	}
+}
+
+// me display informations related to the user with the logger in a table.
+func me(user backend.User, logger *logrus.Logger, translator core.Translator) {
+	var sb strings.Builder
+
+	// Write table into the string.Builder.
+	table := tablewriter.NewWriter(&sb)
+	table.SetHeader([]string{
+		translator.Translate("Email"),
+		translator.Translate("Firstname"),
+		translator.Translate("Lastname"),
+		translator.Translate("Job"),
+	})
+	table.SetCaption(true, translator.Translate("MeCaption"))
+
+	// Fill the table with existing datas.
+	var row []string
+	row = append(
+		row,
+		[]string{
+			user.Email,
+			user.FirstName,
+			user.LastName,
+			user.Job,
+		}...,
+	)
+	table.Append(row)
+
+	// Render the table into the string.Builder.
+	table.Render()
+
+	logger.WithFields(logrus.Fields{
+		"user": user.ID,
+	}).Infof("%s\n", sb.String())
 }

@@ -20,7 +20,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"time"
 
@@ -28,9 +27,9 @@ import (
 	"github.com/gusmin/gate/pkg/backend"
 	"github.com/gusmin/gate/pkg/commands"
 	"github.com/gusmin/gate/pkg/config"
+	"github.com/gusmin/gate/pkg/core"
 	"github.com/gusmin/gate/pkg/database"
 	"github.com/gusmin/gate/pkg/i18n"
-	"github.com/gusmin/gate/pkg/session"
 	"github.com/gusmin/gate/pkg/shell"
 	"gopkg.in/natefinch/lumberjack.v2"
 
@@ -47,15 +46,14 @@ const (
 func main() {
 	cfg, err := config.FromFile(configFile)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
-	config.Debug(&cfg)
 
 	// open DB
 	repo := database.NewSecureGateBoltRepository(cfg.DBPath)
 	err = repo.OpenDatabase()
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 	defer repo.CloseDatabase()
 
@@ -82,7 +80,7 @@ func main() {
 
 	translator := i18n.NewTranslatorFromFile(cfg.Language, translationsDir)
 
-	sess := session.New(
+	core := core.New(
 		cfg.SSHUser,
 		backendClient,
 		agentClient,
@@ -90,12 +88,15 @@ func main() {
 		translator,
 		repo,
 	)
-	command := commands.NewSecureGateCommand(sess)
-	prompt := shell.NewSecureGatePrompt(sess)
+	command := commands.NewSecureGateCommand(core)
+	prompt, err := shell.NewSecureGatePrompt(os.Stdin, core)
+	if err != nil {
+		logrus.Fatal(err)
+	}
 	defer prompt.Close()
-	sh := shell.New(prompt, command, sess)
+	sh := shell.NewSecureGateShell(prompt, command, core)
 
-	log.Fatal(sh.Run())
+	logrus.Fatal(sh.Run())
 }
 
 // flockWriter blocks until it obtains an exclusive file lock
@@ -153,50 +154,50 @@ func (hook *writerHook) Fire(entry *logrus.Entry) error {
 	}{}
 	_ = json.Unmarshal(logEntry, &logObj)
 
-	if logObj.Machine == "" {
-		_, err = hook.writer.Write(logEntry)
-		return err
-	}
-
-	// Send logs to the backend
-	input := backend.MachineLogInput{
-		MachineID: logObj.Machine,
-		UserID:    logObj.User,
-		Log:       logObj.Msg,
-		// Timestamp in millisecond
-		Timestamp: float64(logObj.Time.Unix() * 1000),
-	}
-	res, err := hook.backendClient.AddMachineLog(
-		context.Background(),
-		[]backend.MachineLogInput{input},
-	)
+	_, err = hook.writer.Write(logEntry)
 	if err != nil {
 		return err
 	}
-	if !res.AddMachineLog.Success {
-		return errors.New("could not add machine log to the backend")
+
+	if hook.backendClient != nil {
+		// Send logs to the backend
+		input := backend.MachineLogInput{
+			// Timestamp in millisecond
+			Timestamp: float64(logObj.Time.Unix() * 1000),
+			UserID:    logObj.User,
+			MachineID: logObj.Machine,
+			Log:       logObj.Msg,
+		}
+		res, err := hook.backendClient.AddMachineLog(
+			context.Background(),
+			[]backend.MachineLogInput{input},
+		)
+		if err != nil {
+			return err
+		}
+		if !res.AddMachineLog.Success {
+			return errors.New("could not add machine log to the backend")
+		}
 	}
 
 	return nil
 }
 
 // initializeLogger adds hooks to send logs to different destinations
-// depending on level and send them to the backend.
-func initializeLogger(w io.Writer, client *backend.Client) session.StructuredLogger {
+// with different formatting depending on level and send them to the backend.
+func initializeLogger(w io.Writer, client *backend.Client) *logrus.Logger {
 	logger := logrus.New()
 
 	// Send all logs to nowhere by default
 	logger.SetOutput(ioutil.Discard)
 
-	// Send all logs excepting debug level to log file
+	// Send all logs level to log file
 	logger.AddHook(&writerHook{
-		writer:    w,
-		logLevels: logrus.AllLevels,
-		formatter: new(logrus.JSONFormatter),
-		// TODO: replace by specific tool to centralize logs
+		writer:        w,
+		logLevels:     logrus.AllLevels,
+		formatter:     new(logrus.JSONFormatter),
 		backendClient: client,
 	})
-
 	// Send logs with level higher or equal to warning to stderr
 	logger.AddHook(&writerHook{
 		writer: os.Stderr,
@@ -207,7 +208,6 @@ func initializeLogger(w io.Writer, client *backend.Client) session.StructuredLog
 		},
 		formatter: new(dummyFormatter),
 	})
-
 	// Send info and debug logs to stdout
 	logger.AddHook(&writerHook{
 		writer: os.Stdout,
@@ -218,5 +218,5 @@ func initializeLogger(w io.Writer, client *backend.Client) session.StructuredLog
 		formatter: new(dummyFormatter),
 	})
 
-	return session.NewLogrusLogger(logger)
+	return logger
 }

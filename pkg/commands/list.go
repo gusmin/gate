@@ -4,45 +4,58 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gusmin/gate/pkg/session"
+	"github.com/gusmin/gate/pkg/backend"
+	"github.com/gusmin/gate/pkg/core"
 	"github.com/olekukonko/tablewriter"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func newListCommand(sess *session.SecureGateSession) *cobra.Command {
+// newListCommand creates a new "list" command tied to the given core.
+func newListCommand(core *core.SecureGateCore) *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
-		Short: sess.Translator.Translate("ListShortDesc", nil),
-		Long:  sess.Translator.Translate("ListShortDesc", nil),
+		Short: core.Translator.Translate("ListShortDesc"),
+		Long:  core.Translator.Translate("ListShortDesc"),
 		Run: func(cmd *cobra.Command, args []string) {
-			var sb strings.Builder
-
-			// write table into the string.Builder
-			table := tablewriter.NewWriter(&sb)
-			table.SetHeader([]string{
-				sess.Translator.Translate("ID", nil),
-				sess.Translator.Translate("Name", nil),
-				sess.Translator.Translate("IP", nil),
-				sess.Translator.Translate("AgentPort", nil),
-			})
-			table.SetCaption(true, sess.Translator.Translate("ListCaption", nil))
-
-			// fill the table
-			for _, machine := range sess.Machines() {
-				table.Append([]string{
-					machine.ID,
-					machine.Name,
-					machine.IP,
-					strconv.Itoa(machine.AgentPort),
-				})
-			}
-
-			// render the table into the string.Builder
-			table.Render()
-
-			sess.Logger.WithFields(session.Fields{
-				"user": sess.User().ID,
-			}).Infof(sb.String())
+			list(core.User(), core.Machines(), core.Logger, core.Translator)
 		},
 	}
+}
+
+// list lists machines informations with the logger in table.
+func list(
+	user backend.User,
+	machines []backend.Machine,
+	logger *logrus.Logger, translator core.Translator) {
+
+	var sb strings.Builder
+
+	// Write table into the string.Builder.
+	table := tablewriter.NewWriter(&sb)
+	table.SetHeader([]string{
+		translator.Translate("ID"),
+		translator.Translate("Name"),
+		translator.Translate("IP"),
+		translator.Translate("AgentPort"),
+	})
+	table.SetCaption(true, translator.Translate("ListCaption"))
+
+	// Fill the table.
+	for _, machine := range machines {
+		table.Append([]string{
+			machine.ID,
+			machine.Name,
+			machine.IP,
+			strconv.Itoa(machine.AgentPort),
+		})
+	}
+
+	// Render the table into the string.Builder.
+	table.Render()
+
+	logger.WithFields(logrus.Fields{
+		"user": user.ID,
+	}).Infof(sb.String())
+
 }

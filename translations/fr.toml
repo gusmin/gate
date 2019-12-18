@@ -1,8 +1,8 @@
 [Hello]
-other = "Salut {{.Firstname}} {{.Lastname}} ! Ca va bien depuis la derniere fois ?"
+other = "Salut %s %s ! Ca va bien depuis la derniere fois ?\n"
 
 [Goodbye]
-other = "A la prochaine {{.Firstname}} {{.Lastname}} !"
+other = "A la prochaine %s %s !\n"
 
 [ID]
 other = "ID"

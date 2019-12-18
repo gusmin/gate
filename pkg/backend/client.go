@@ -1,3 +1,4 @@
+// Package backend contains a client for the Secure Gate backend API.
 package backend
 
 import (
@@ -11,7 +12,10 @@ import (
 type Client struct {
 	// contains filtered or unexported fields
 	gqlClient *graphql.Client
-	token     string // JWT token used in requests. Must be set with func SetToken
+
+	// JWT token used in requests.
+	// Automatically set after successful authentication.
+	token string
 }
 
 // NewClient creates a new GraphQL client pointing to the given backend endpoint.
@@ -19,17 +23,13 @@ func NewClient(endpoint string) *Client {
 	return &Client{gqlClient: graphql.NewClient(endpoint)}
 }
 
-// SetToken set the JWT token used to authenticate on the server
-// This token is given by the backend after a successful Auth request.
-func (c *Client) SetToken(token string) { c.token = token }
-
 // AuthResponse is the response sent by the server after an auth query.
 type AuthResponse struct {
 	Auth Auth `json:"auth"`
 }
 
 // Auth contains a success value that can be either true or false.
-// When it is true the token identity is returned as well as a success message.
+// When it is true an authentication token is returned as well as a success message.
 // Otherwise no token is returned and you should refer to the error message.
 type Auth struct {
 	Success bool   `json:"success"`
@@ -44,6 +44,9 @@ func (c *Client) Auth(ctx context.Context, email, password string) (AuthResponse
 	if err != nil {
 		return AuthResponse{}, errors.Wrap(err, "auth request failed")
 	}
+
+	// Set the authentication token if successful.
+	c.token = res.Auth.Token
 	return res, nil
 }
 
@@ -52,7 +55,7 @@ type MachinesResponse struct {
 	Machines []Machine `json:"machines"`
 }
 
-// Machine is the machine informations.
+// Machine represents the machine informations.
 type Machine struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
@@ -75,7 +78,7 @@ type MeResponse struct {
 	User User `json:"user"`
 }
 
-// User is the user informations.
+// User represents the user informations.
 type User struct {
 	ID        string `json:"id"`
 	Email     string `json:"email"`
@@ -114,7 +117,7 @@ type MachineLogInput struct {
 	Log       string  `json:"log"`
 }
 
-// AddMachineLog send session's recorded log.
+// AddMachineLog sends session's recorded log.
 func (c *Client) AddMachineLog(ctx context.Context, inputs []MachineLogInput) (AddMachineLogResponse, error) {
 	var res AddMachineLogResponse
 	err := c.gqlClient.Run(ctx, makeAddMachineLogRequest(c.token, inputs), &res)

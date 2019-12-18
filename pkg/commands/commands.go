@@ -1,9 +1,10 @@
+// Package commands provides the command tree of Secure Gate.
 package commands
 
 import (
 	"strings"
 
-	"github.com/gusmin/gate/pkg/session"
+	"github.com/gusmin/gate/pkg/core"
 	"github.com/spf13/cobra"
 )
 
@@ -11,27 +12,26 @@ import (
 type SecureGateCommand struct {
 	// contains filtered or unexported fields
 	root *cobra.Command
-	sess *session.SecureGateSession
 }
 
-// NewSecureGateCommand creates a new command tree for the given Secure Gate session.
-func NewSecureGateCommand(sess *session.SecureGateSession) *SecureGateCommand {
+// NewSecureGateCommand creates a new command tree using the given Secure Gate core.
+func NewSecureGateCommand(core *core.SecureGateCore) *SecureGateCommand {
 	root := &cobra.Command{SilenceErrors: true}
 	root.AddCommand(
-		newListCommand(sess),
-		newMeCommand(sess),
-		newConnectCommand(sess),
-		newLogoutCommand(sess),
-		newExitCommand(sess),
+		newListCommand(core),
+		newMeCommand(core),
+		newConnectCommand(core),
+		newLogoutCommand(core),
+		newExitCommand(core),
 	)
 
 	return &SecureGateCommand{
 		root: root,
-		sess: sess,
 	}
 }
 
-// Execute executes the given command line if not empty.
+// Execute executes the given command line if not empty
+// and returns an error if the command failed.
 func (c *SecureGateCommand) Execute(cmd string) error {
 	if cmd == "" {
 		return nil

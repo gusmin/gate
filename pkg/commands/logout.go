@@ -1,17 +1,17 @@
 package commands
 
 import (
-	"github.com/gusmin/gate/pkg/session"
+	"github.com/gusmin/gate/pkg/core"
 	"github.com/spf13/cobra"
 )
 
-func newLogoutCommand(sess *session.SecureGateSession) *cobra.Command {
+func newLogoutCommand(core *core.SecureGateCore) *cobra.Command {
 	return &cobra.Command{
 		Use:   "logout",
-		Short: sess.Translator.Translate("LogoutShortDesc", nil),
-		Long:  sess.Translator.Translate("LogoutShortDesc", nil),
+		Short: core.Translator.Translate("LogoutShortDesc"),
+		Long:  core.Translator.Translate("LogoutShortDesc"),
 		Run: func(cmd *cobra.Command, args []string) {
-			sess.SignOut()
+			core.SignOut()
 		},
 	}
 }

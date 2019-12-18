@@ -1,8 +1,8 @@
 [Hello]
-other = "{{.Firstname}} {{.Lastname}} 안녕! 잘 지냈어요 ?"
+other = "%s %s 안녕! 잘 지냈어요 ?\n"
 
 [Goodbye]
-other = "안녕히가세요 {{.Firstname}} {{.Lastname}} 고객님 ! 또 오세요 !"
+other = "안녕히가세요 %s %s 고객님 ! 또 오세요 !\n"
 
 [ID]
 other = "아이디"

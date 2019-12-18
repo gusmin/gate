@@ -26,9 +26,8 @@ func NewTranslatorFromFile(lang, translationsPath string) *Translator {
 }
 
 // Translate translates a templated message.
-func (t *Translator) Translate(message string, template interface{}) string {
+func (t Translator) Translate(message string) string {
 	return t.localizer.MustLocalize(&i18n.LocalizeConfig{
-		MessageID:    message,
-		TemplateData: template,
+		MessageID: message,
 	})
 }

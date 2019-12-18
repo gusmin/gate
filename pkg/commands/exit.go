@@ -3,18 +3,18 @@ package commands
 import (
 	"os"
 
-	"github.com/gusmin/gate/pkg/session"
+	"github.com/gusmin/gate/pkg/core"
 	"github.com/spf13/cobra"
 )
 
-func newExitCommand(sess *session.SecureGateSession) *cobra.Command {
+func newExitCommand(core *core.SecureGateCore) *cobra.Command {
 	return &cobra.Command{
 		Use:   "exit",
-		Short: sess.Translator.Translate("ExitShortDesc", nil),
-		Long:  sess.Translator.Translate("ExitShortDesc", nil),
+		Short: core.Translator.Translate("ExitShortDesc"),
+		Long:  core.Translator.Translate("ExitShortDesc"),
 		Run: func(cmd *cobra.Command, args []string) {
 			// avoid leaking goroutines
-			sess.SignOut()
+			core.SignOut()
 
 			os.Exit(0)
 		},

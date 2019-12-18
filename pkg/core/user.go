@@ -1,4 +1,4 @@
-package session
+package core
 
 import (
 	"sync"
@@ -6,8 +6,8 @@ import (
 	"github.com/gusmin/gate/pkg/backend"
 )
 
-// userInfos are the logged in user related informations.
-type userInfos struct {
+// session are the logged in user related informations.
+type session struct {
 	pubKey   []byte       // initialized in loadSSHPublickey
 	user     safeUser     // updated during background polling
 	machines safeMachines // updated during background polling

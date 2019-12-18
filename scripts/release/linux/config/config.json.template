@@ -3,6 +3,5 @@
   "ssh_user": "gateuser",
   "agent_authentication_token": "",
   "language": "en",
-  "mongo_uri": "mongodb://localhost:27017/",
-  "mongo_db_name": "securegate"
+  "db_path: "/var/lib/securegate/gate/"
 }

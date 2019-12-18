@@ -1,10 +1,10 @@
 # Gate
 
 [![GoDoc](https://godoc.org/github.com/gusmin/gate/pkg?status.svg)](https://godoc.org/github.com/gusmin/gate/pkg)
-[![Build Status](https://travis-ci.com/gusmin/gate.svg?token=6WEq9jpFesV2iXzoQsy4&branch=master)](https://travis-ci.com/gusmin/gate)
+[![Build Status](https://travis-ci.com/atrahy/gate.svg?token=xuCuQMuPLxpwzP2jsQ7f&branch=master)](https://travis-ci.com/atrahy/gate)
 [![Built with Mage](https://magefile.org/badge.svg)](https://magefile.org)
 
-<img src="https://media.discordapp.net/attachments/433311912281767978/626863798610821130/logo_400dpi.png?width=764&height=884" width=60>
+<img src="https://media.discordapp.net/attachments/433311912281767978/626863798610821130/logo_400dpi.png?width=764&height=884" width=100>
 
 ***
 
@@ -40,7 +40,7 @@ For more informations about Secure Gate check out our other repositories:
     |           Setting          |                      Description                     |  Value |
     |:--------------------------:|:----------------------------------------------------:|:------:|
     |         backend_uri        |          URI of your running backend server          | string |
-    |          ssh_user          |                 SSH user used for al                 | string |
+    |          ssh_user          |                 user used for SSH connection                 | string |
     | agent_authentication_token | Bearer token used for authentication on agent's side | string |
     |          language          |              Language of the application             | string |
     |        db_path       |             Path of your database            | string |
@@ -54,7 +54,7 @@ For more informations about Secure Gate check out our other repositories:
     $ ./install
     ```
 
-    This installation script will do **EVERYTHING** for you and set up the Gate :rainbow:
+    This installation script will do **EVERYTHING** for you and set up the Gate
 
     - It creates a new user: `secure`
     - Installs the binary `securegate-gate` in `/usr/bin/`
@@ -62,10 +62,10 @@ For more informations about Secure Gate check out our other repositories:
     - Makes a special directory to store your logs in `/var/log/securegate/gate/`
     - Installs the available translations in case you need to change the langage later on.
 
-        *Available languages are English, French and Korean*
+        _Available languages are English, French and Korean_
     - Set the default shell of the user `secure` to `/usr/bin/securegate-gate`
 
-### :crystal_ball: All with Mage
+### With Mage
 
 1. If you don't have [Mage](https://magefile.org) already installed **install it**
 
@@ -81,30 +81,32 @@ For more informations about Secure Gate check out our other repositories:
 
 ## :milky_way: Welcome in the Gate
 
-**Congrats you finished to install the Gate ! Now let's get in !** :tada:
+Congrats you finished to install the Gate ! Now let's get started ! :tada:
+
+:warning: _Make sure an instance of our [Backend]([Backend](https://github.com/atrahy/backend)) is running somewhere and that your configuration file is tied to its URI._
 
 In the first place you'll have to sign up with on your Secure Gate account.
 
-*The credentials are the ones you used during your sign in on the [Frontend](https://github.com/atrahy/frontend)*.
+_The credentials are the ones you used during your sign in on the [Frontend](https://github.com/atrahy/frontend)_.
 
-### :computer: Commands
+### Commands
 
 ```console
-help                ## Help about any command
-me                  ## Display informations about the current user
-list                ## List all accessible nodes
-connect             ## Open SSH connection to a machine
-logout              ## Terminate the session
+help                ## Global help about commands
+me                  ## Display informations related to the user
+list                ## List all accessible nodes by the user
+connect             ## Open SSH connection to a node
+logout              ## Terminate the session current session
 exit                ## Close the shell
 ```
 
 #### :books: Help
 
-##### Provides informations about the available commands
+Provides global informations about  commands in the Gate
 
 *Althought every commands have their own help option.*
 
-*e.g. `[command] --help`*
+_e.g. `[command] --help`_
 
 ```
 securegate$ help
@@ -114,8 +116,8 @@ Usage:
   [command]
 
 Available Commands:
-  connect     Open SSH connection to a machine
-  machine     List all accessible nodes
+  connect     Open SSH connection to a node
+  machine     List all accessible nodes by the user
   ...
   ...
 
@@ -124,7 +126,7 @@ Use "[command] --help" for more information about this command
 
 #### :ok_woman: Me
 
-##### Display informations related to the current user
+Display informations related to the current user
 
 ```
 securegate$ me
@@ -136,18 +138,9 @@ securegate$ me
 You.
 ```
 
-#### :electric_plug: Connect
-
-##### Open a SSH connection toward the machine given as argument
-
-```Shell
-securegate$ connect nowhere
-dummy@nowhere-pc:~$
-```
-
 #### :scroll: List
 
-##### List all the accessible machines by the current user
+List all the accessible machines by the current user
 
 ```
 securegate$ list
@@ -161,18 +154,28 @@ securegate$ list
 Available nodes.
 ```
 
+#### :electric_plug: Connect
+
+Open SSH connection toward the machine given as argument
+
+```Shell
+securegate$ connect nowhere
+dummy@nowhere-pc:~$
+```
+
 #### :walking: Logout
 
-##### Terminate the active session
+Terminate the current session
 
 ```
 securegate$ logout
+See you soon bro!
 Email:
 ```
 
 #### :running: Exit
 
-##### Close the shell with the given exit status (0 by default)
+Close the shell with the given exit status (0 by default)
 
 ```shell
 securegate$ exit 42

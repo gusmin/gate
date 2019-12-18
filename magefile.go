@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	version           = "0.0.3"
+	version           = "0.3.0"
 	packageName       = "github.com/gusmin/gate"
 	golintPackage     = "golang.org/x/lint/golint"
 	securegateKeysDir = ".sgsh"
@@ -161,7 +161,7 @@ func golintInstall() {
 func initConfiguration() {
 	fmt.Println("[>] Checking for existing configuration file config.json")
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		fmt.Println("[x] You need to copy config.json.templatem to config.json and " +
+		fmt.Println("[x] You need to copy config.json.template to config.json and " +
 			"complete the configuration before launching the installation")
 		log.Fatal(err)
 	} else {
