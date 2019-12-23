@@ -130,7 +130,7 @@ func Lint() {
 // Test Run tests
 func Test() error {
 	fmt.Println("[>] Testing")
-	return goTest("-v", "-race", "-coverprofile=cover.out", "./...")
+	return goTest("-v", "-coverprofile=cover.out", "./...")
 }
 
 // Check Run tests and linter
