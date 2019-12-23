@@ -14,7 +14,7 @@ const addMachineLogMutation = `
 
 func makeAddMachineLogRequest(token string, inputs []MachineLogInput) *gql.Request {
 	req := gql.NewRequest(addMachineLogMutation)
-	req.Header.Set("Authorization", "JWT "+token)
+	req.Header.Set("Authorization", token)
 	req.Var("machineLogs", inputs)
 	return req
 }

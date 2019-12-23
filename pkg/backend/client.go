@@ -45,8 +45,6 @@ func (c *Client) Auth(ctx context.Context, email, password string) (AuthResponse
 		return AuthResponse{}, errors.Wrap(err, "auth request failed")
 	}
 
-	// Set the authentication token if successful.
-	c.token = res.Auth.Token
 	return res, nil
 }
 
@@ -125,4 +123,11 @@ func (c *Client) AddMachineLog(ctx context.Context, inputs []MachineLogInput) (A
 		return AddMachineLogResponse{}, errors.Wrap(err, "addMachineLog request failed")
 	}
 	return res, nil
+}
+
+// SetToken set the JWT used for future requests to the given token.
+// What you usually want to do is to set it with the token you received
+// after a successful Auth request.
+func (c *Client) SetToken(token string) {
+	c.token = "JWT " + token
 }

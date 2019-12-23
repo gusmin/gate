@@ -83,7 +83,7 @@ For more informations about Secure Gate check out our other repositories:
 
 Congrats you finished to install the Gate ! Now let's get started ! :tada:
 
-:warning: _Make sure an instance of our [Backend]([Backend](https://github.com/atrahy/backend)) is running somewhere and that your configuration file is tied to its URI._
+> :warning: _Note: Make sure an instance of our [Backend]([Backend](https://github.com/atrahy/backend)) is running somewhere and that your configuration file is tied to its URI._
 
 In the first place you'll have to sign up with on your Secure Gate account.
 
@@ -104,9 +104,9 @@ exit                ## Close the shell
 
 Provides global informations about  commands in the Gate
 
-*Althought every commands have their own help option.*
-
-_e.g. `[command] --help`_
+> _Note: Althought every commands have their own help option._
+>
+> _e.g. `[command] --help`_
 
 ```
 securegate$ help

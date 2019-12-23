@@ -4,7 +4,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,22 +11,21 @@ func TestReadline(t *testing.T) {
 	assert := require.New(t)
 
 	tt := []struct {
-		name         string
-		line         string
-		expectedLine string
-		err          string
+		name               string
+		line, expectedLine string
+		expectedErr        string
 	}{
 		{
 			name:         "valid line",
 			line:         "foo",
 			expectedLine: "foo",
-			err:          "",
+			expectedErr:  "",
 		},
 		{
 			name:         "EOF",
 			line:         "",
 			expectedLine: "",
-			err:          "EOF",
+			expectedErr:  "EOF",
 		},
 	}
 
@@ -42,8 +40,8 @@ func TestReadline(t *testing.T) {
 
 			line, err := prompt.Readline("test$")
 			if err != nil {
-				assert.Equalf(tc.err, err.Error(),
-					"expected error was %v but got %v", tc.err, err)
+				assert.Equalf(tc.expectedErr, err.Error(),
+					"expected error was %v but got %v", tc.expectedErr, err)
 			}
 
 			assert.Equalf(tc.expectedLine, line,
@@ -59,19 +57,19 @@ func TestReadPassword(t *testing.T) {
 		name         string
 		line         string
 		expectedLine string
-		err          string
+		expectedErr  string
 	}{
 		{
 			name:         "valid lines",
 			line:         "foo",
 			expectedLine: "foo",
-			err:          "",
+			expectedErr:  "",
 		},
 		{
 			name:         "EOF",
 			line:         "",
 			expectedLine: "",
-			err:          "EOF",
+			expectedErr:  "EOF",
 		},
 	}
 
@@ -86,8 +84,8 @@ func TestReadPassword(t *testing.T) {
 
 			line, err := prompt.ReadPassword("test$")
 			if err != nil {
-				assert.Equalf(tc.err, errors.Cause(err).Error(),
-					"expected error was %v but got %v", tc.err, err)
+				assert.Equalf(tc.expectedErr, err.Error(),
+					"expected error was %v but got %v", tc.expectedErr, err)
 			}
 
 			assert.Equalf(tc.expectedLine, line,

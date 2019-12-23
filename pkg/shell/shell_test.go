@@ -15,7 +15,7 @@ func TestAskCredentials(t *testing.T) {
 		name                            string
 		emailInput, expectedEmail       string
 		passwordInput, expectedPassword string
-		err                             string
+		expectedErr                     string
 	}{
 		{
 			name:             "valid inputs",
@@ -23,7 +23,7 @@ func TestAskCredentials(t *testing.T) {
 			expectedEmail:    "email",
 			passwordInput:    "pass",
 			expectedPassword: "pass",
-			err:              "",
+			expectedErr:      "",
 		},
 		{
 			name:             "email EOF",
@@ -31,7 +31,7 @@ func TestAskCredentials(t *testing.T) {
 			expectedEmail:    "",
 			passwordInput:    "",
 			expectedPassword: "",
-			err:              "could not read email: EOF",
+			expectedErr:      "could not read email: EOF",
 		},
 		{
 			name:             "password EOF",
@@ -39,7 +39,7 @@ func TestAskCredentials(t *testing.T) {
 			expectedEmail:    "email",
 			passwordInput:    "",
 			expectedPassword: "",
-			err:              "could not read password: EOF",
+			expectedErr:      "could not read password: EOF",
 		},
 	}
 
@@ -66,8 +66,8 @@ func TestAskCredentials(t *testing.T) {
 
 			email, password, err := sh.askForCredentials()
 			if err != nil {
-				assert.Equalf(tc.err, err.Error(),
-					"expected error was: %v, but got %v", tc.err, err)
+				assert.Equalf(tc.expectedErr, err.Error(),
+					"expected error was: %v, but got %v", tc.expectedErr, err)
 			}
 
 			assert.Equalf(tc.expectedEmail, email,

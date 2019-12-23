@@ -1,3 +1,4 @@
+// Package database provides
 package database
 
 import (
@@ -8,9 +9,9 @@ import (
 )
 
 const (
-	// database file name
+	// Default database file name
 	databaseName = "securegate.db"
-	// name of the bucket where all users are stored
+	// Name of the bucket where all users are stored
 	usersBucketName = "users"
 )
 
@@ -18,8 +19,9 @@ const (
 // with a key/value embedded and lightweight database
 // called Bolt(Github: https://github.com/boltdb/bolt).
 type SecureGateBoltRepository struct {
-	// database directory
+	// Database directory
 	Path string
+
 	// contains filtered or unexported fields
 	db *bolt.DB
 }
@@ -37,13 +39,13 @@ func NewSecureGateBoltRepository(path string) *SecureGateBoltRepository {
 // Then it creates all the bucket in the database if they still
 // do not exist.
 func (repo *SecureGateBoltRepository) OpenDatabase() error {
-	// open database or create one if none exist already
+	// Open database or create one if none exist already.
 	db, err := bolt.Open(path.Join(repo.Path, databaseName), 0666, nil)
 	if err != nil {
 		return err
 	}
 
-	// create the top-level buckets
+	// Create the top-level buckets.
 	err = db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(usersBucketName))
 		if err != nil {
@@ -84,7 +86,7 @@ type Machine struct {
 // UpsertUser updates the user in the database or insert it if it
 // do not exists already.
 func (repo *SecureGateBoltRepository) UpsertUser(user User) error {
-	// struct values in the database are stored as JSON
+	// Struct values in the database are stored as JSON.
 	userBytes, err := json.Marshal(&user)
 	if err != nil {
 		return err
@@ -114,7 +116,7 @@ func (repo *SecureGateBoltRepository) GetUser(userID string) (User, error) {
 		b := tx.Bucket([]byte(usersBucketName))
 		v := b.Get([]byte(userID))
 
-		// struct values in the database are stored as JSON
+		// Struct values in the database are stored as JSON.
 		err := json.Unmarshal(v, &user)
 		if err != nil {
 			return err

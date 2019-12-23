@@ -34,7 +34,7 @@ const machinesQuery = `
 
 func makeMachinesRequest(token string) *gql.Request {
 	req := gql.NewRequest(machinesQuery)
-	req.Header.Set("Authorization", "JWT "+token)
+	req.Header.Set("Authorization", token)
 	return req
 }
 
@@ -52,6 +52,6 @@ const meQuery = `
 
 func makeMeRequest(token string) *gql.Request {
 	req := gql.NewRequest(meQuery)
-	req.Header.Set("Authorization", "JWT "+token)
+	req.Header.Set("Authorization", token)
 	return req
 }

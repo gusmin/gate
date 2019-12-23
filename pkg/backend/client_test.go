@@ -17,7 +17,7 @@ func TestAuth(t *testing.T) {
 		email, password string
 		expectedVars    string
 		resp            string
-		expectedRes     AuthResponse
+		expectedResp    AuthResponse
 		err             string
 	}{
 		{
@@ -41,7 +41,7 @@ func TestAuth(t *testing.T) {
 				}
 			}
 			`,
-			expectedRes: AuthResponse{
+			expectedResp: AuthResponse{
 				Auth{
 					Success: true,
 					Token:   "token",
@@ -65,8 +65,8 @@ func TestAuth(t *testing.T) {
 				invalid json
 			}
 			`,
-			expectedRes: AuthResponse{},
-			err:         "auth request failed: decoding response: invalid character 'i' looking for beginning of object key string",
+			expectedResp: AuthResponse{},
+			err:          "auth request failed: decoding response: invalid character 'i' looking for beginning of object key string",
 		},
 	}
 
@@ -89,8 +89,8 @@ func TestAuth(t *testing.T) {
 					"expected error to be: %v, but actual is: %v", tc.err, err)
 			}
 
-			assert.Equalf(tc.expectedRes, resp,
-				"expected response to be: %+v, but actual is: %+v", tc.expectedRes, resp)
+			assert.Equalf(tc.expectedResp, resp,
+				"expected response to be: %+v, but actual is: %+v", tc.expectedResp, resp)
 		})
 	}
 }
@@ -99,11 +99,11 @@ func TestMachines(t *testing.T) {
 	assert := require.New(t)
 
 	tt := []struct {
-		name        string
-		token       string
-		resp        string
-		expectedRes MachinesResponse
-		err         string
+		name         string
+		token        string
+		resp         string
+		expectedResp MachinesResponse
+		err          string
 	}{
 		{
 			name:  "valid JSON response",
@@ -121,7 +121,7 @@ func TestMachines(t *testing.T) {
 				}
 			}
 			`,
-			expectedRes: MachinesResponse{
+			expectedResp: MachinesResponse{
 				Machines: []Machine{
 					{
 						Name:      "localhost",
@@ -140,8 +140,8 @@ func TestMachines(t *testing.T) {
 				invalid json
 			}
 			`,
-			expectedRes: MachinesResponse{},
-			err:         "machines request failed: decoding response: invalid character 'i' looking for beginning of object key string",
+			expectedResp: MachinesResponse{},
+			err:          "machines request failed: decoding response: invalid character 'i' looking for beginning of object key string",
 		},
 	}
 
@@ -157,7 +157,7 @@ func TestMachines(t *testing.T) {
 			defer server.Close()
 
 			client := NewClient(server.URL)
-			client.token = tc.token
+			client.SetToken(tc.token)
 
 			resp, err := client.Machines(context.Background())
 			if err != nil {
@@ -165,8 +165,8 @@ func TestMachines(t *testing.T) {
 					"expected error to be: %v, but actual is: %v", tc.err, err)
 			}
 
-			assert.Equalf(tc.expectedRes, resp,
-				"expected response to be: %+v, but actual is: %+v", tc.expectedRes, resp)
+			assert.Equalf(tc.expectedResp, resp,
+				"expected response to be: %+v, but actual is: %+v", tc.expectedResp, resp)
 		})
 	}
 }
@@ -175,11 +175,11 @@ func TestMe(t *testing.T) {
 	assert := require.New(t)
 
 	tt := []struct {
-		name        string
-		token       string
-		resp        string
-		expectedRes MeResponse
-		err         string
+		name         string
+		token        string
+		resp         string
+		expectedResp MeResponse
+		err          string
 	}{
 		{
 			name:  "valid JSON response",
@@ -194,7 +194,7 @@ func TestMe(t *testing.T) {
 				}
 			}
 			`,
-			expectedRes: MeResponse{
+			expectedResp: MeResponse{
 				User{
 					Email:     "admin",
 					FirstName: "Super",
@@ -210,8 +210,8 @@ func TestMe(t *testing.T) {
 				invalid json
 			}
 			`,
-			expectedRes: MeResponse{},
-			err:         "me request failed: decoding response: invalid character 'i' looking for beginning of object key string",
+			expectedResp: MeResponse{},
+			err:          "me request failed: decoding response: invalid character 'i' looking for beginning of object key string",
 		},
 	}
 
@@ -227,7 +227,7 @@ func TestMe(t *testing.T) {
 			defer server.Close()
 
 			client := NewClient(server.URL)
-			client.token = tc.token
+			client.SetToken(tc.token)
 
 			resp, err := client.Me(context.Background())
 			if err != nil {
@@ -235,8 +235,8 @@ func TestMe(t *testing.T) {
 					"expected error to be: %v, but actual is: %v", tc.err, err)
 			}
 
-			assert.Equalf(tc.expectedRes, resp,
-				"expected response to be: %+v, but actual is: %+v", tc.expectedRes, resp)
+			assert.Equalf(tc.expectedResp, resp,
+				"expected response to be: %+v, but actual is: %+v", tc.expectedResp, resp)
 		})
 	}
 }
@@ -250,7 +250,7 @@ func TestAddMachineLog(t *testing.T) {
 		inputs         []MachineLogInput
 		expectedInputs string
 		resp           string
-		expectedRes    AddMachineLogResponse
+		expectedResp   AddMachineLogResponse
 		err            string
 	}{
 		{
@@ -285,7 +285,7 @@ func TestAddMachineLog(t *testing.T) {
 				}
 			}
 			`,
-			expectedRes: AddMachineLogResponse{
+			expectedResp: AddMachineLogResponse{
 				BaseResult{
 					Success: true,
 				},
@@ -306,8 +306,8 @@ func TestAddMachineLog(t *testing.T) {
 				invalid json
 			}
 			`,
-			expectedRes: AddMachineLogResponse{},
-			err:         "addMachineLog request failed: decoding response: invalid character 'i' looking for beginning of object key string",
+			expectedResp: AddMachineLogResponse{},
+			err:          "addMachineLog request failed: decoding response: invalid character 'i' looking for beginning of object key string",
 		},
 	}
 
@@ -326,7 +326,7 @@ func TestAddMachineLog(t *testing.T) {
 			defer server.Close()
 
 			client := NewClient(server.URL)
-			client.token = tc.token
+			client.SetToken(tc.token)
 
 			resp, err := client.AddMachineLog(context.Background(), tc.inputs)
 			if err != nil {
@@ -334,8 +334,8 @@ func TestAddMachineLog(t *testing.T) {
 					"expected error to be: %v, but actual is: %v", tc.err, err)
 			}
 
-			assert.Equalf(tc.expectedRes, resp,
-				"expected response to be: %+v, but actual is: %+v", tc.expectedRes, resp)
+			assert.Equalf(tc.expectedResp, resp,
+				"expected response to be: %+v, but actual is: %+v", tc.expectedResp, resp)
 		})
 	}
 }

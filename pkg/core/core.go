@@ -70,6 +70,8 @@ type BackendClient interface {
 	Me(ctx context.Context) (backend.MeResponse, error)
 	// AddMachineLog sends logs to the server.
 	AddMachineLog(ctx context.Context, inputs []backend.MachineLogInput) (backend.AddMachineLogResponse, error)
+	// SetToken set the JWT which will be used for requests.
+	SetToken(token string)
 }
 
 // AgentClient is a client which can interact with our agents.
@@ -107,6 +109,7 @@ func (core *SecureGateCore) SignUp(email, password string) error {
 	if resp.Auth.Success == false {
 		return fmt.Errorf("authentication during sign up failed: %s", resp.Auth.Message)
 	}
+	core.BackendClient.SetToken(resp.Auth.Token)
 
 	err = core.initUserSession()
 	if err != nil {
