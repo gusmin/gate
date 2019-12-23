@@ -16,3 +16,6 @@ script:
   - cp config.json.template config.json
   - mage -v install
   - mage -v check
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
