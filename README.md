@@ -3,6 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/gusmin/gate/pkg?status.svg)](https://godoc.org/github.com/gusmin/gate/pkg)
 [![Build Status](https://travis-ci.com/atrahy/gate.svg?token=xuCuQMuPLxpwzP2jsQ7f&branch=master)](https://travis-ci.com/atrahy/gate)
 [![Built with Mage](https://magefile.org/badge.svg)](https://magefile.org)
+[![Maintainability](https://api.codeclimate.com/v1/badges/e192ff5dd67ab04e419b/maintainability)](https://codeclimate.com/github/gusmin/gate/maintainability)
 
 <img src="https://media.discordapp.net/attachments/433311912281767978/626863798610821130/logo_400dpi.png?width=764&height=884" width=100>
 
