@@ -5,6 +5,9 @@ go:
 
 sudo: required
 
+env:
+  - CODECOV_TOKEN="68778948-28b1-47a7-adf2-2bb615eb5428"
+
 install:
   - go get -u github.com/magefile/mage
   - go get -u golang.org/x/lint/golint
