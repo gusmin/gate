@@ -635,7 +635,9 @@ func TestSignout(t *testing.T) {
 	core.SignOut()
 
 	assert.False(core.LoggedIn())
-	assert.Empty(core.session)
+	assert.Empty(core.User())
+	assert.Empty(core.Machines())
+	assert.Len(core.session.pubKey, 0)
 }
 
 func TestPoll(t *testing.T) {
