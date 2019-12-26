@@ -1,14 +1,15 @@
 package shell
 
 import (
-	"os"
 	"strings"
 	"testing"
 
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/require"
 )
 
 func TestAskCredentials(t *testing.T) {
+	fs := afero.NewMemMapFs()
 	assert := require.New(t)
 
 	tt := []struct {
@@ -55,8 +56,8 @@ func TestAskCredentials(t *testing.T) {
 				}
 			}
 
-			f := mockInput(assert, sb.String())
-			defer os.Remove(f.Name())
+			f := mockInput(fs, assert, sb.String())
+			defer fs.Remove(f.Name())
 
 			prompt, err := NewSecureGatePrompt(f, nil)
 			assert.NoError(err)

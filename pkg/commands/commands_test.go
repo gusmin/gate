@@ -1,14 +1,13 @@
 package commands
 
 import (
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/gusmin/gate/pkg/backend"
 	"github.com/gusmin/gate/pkg/core"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/require"
 )
 
@@ -65,6 +64,7 @@ func TestExecute(t *testing.T) {
 }
 
 func TestMe(t *testing.T) {
+	fs := afero.NewMemMapFs()
 	assert := require.New(t)
 
 	user := backend.User{
@@ -75,11 +75,11 @@ func TestMe(t *testing.T) {
 		Job:       "gopher",
 	}
 
-	f, err := ioutil.TempFile("", "")
+	file, err := afero.TempFile(fs, "", "")
 	assert.NoError(err)
-	defer os.Remove(f.Name())
+	defer fs.Remove(file.Name())
 
-	logrus.SetOutput(f)
+	logrus.SetOutput(file)
 	logrus.SetFormatter(&logrus.TextFormatter{
 		DisableTimestamp: true,
 	})
@@ -88,7 +88,7 @@ func TestMe(t *testing.T) {
 
 	const expected = "level=info msg=\"+-------------------+-----------+----------+--------+\\n|       EMAIL       | FIRSTNAME | LASTNAME |  JOB   |\\n+-------------------+-----------+----------+--------+\\n| foo.bar@gmail.com | foo       | bar      | gopher |\\n+-------------------+-----------+----------+--------+\\nMeCaption\\n\\n\" user=foobar42\n"
 
-	b, err := ioutil.ReadFile(f.Name())
+	b, err := afero.ReadFile(fs, file.Name())
 	assert.NoError(err)
 	actual := string(b)
 
@@ -96,6 +96,7 @@ func TestMe(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
+	fs := afero.NewMemMapFs()
 	assert := require.New(t)
 
 	user := backend.User{
@@ -115,11 +116,11 @@ func TestList(t *testing.T) {
 		},
 	}
 
-	f, err := ioutil.TempFile("", "")
+	file, err := afero.TempFile(fs, "", "")
 	assert.NoError(err)
-	defer os.Remove(f.Name())
+	defer fs.Remove(file.Name())
 
-	logrus.SetOutput(f)
+	logrus.SetOutput(file)
 	logrus.SetFormatter(&logrus.TextFormatter{
 		DisableTimestamp: true,
 	})
@@ -127,7 +128,7 @@ func TestList(t *testing.T) {
 	list(user, machines, logrus.StandardLogger(), &mockTranslator{})
 
 	const expected = "level=info msg=\"+-----------+---------+-----------+-----------+\\n|    ID     |  NAME   |    IP     | AGENTPORT |\\n+-----------+---------+-----------+-----------+\\n| nowhere42 | nowhere | localhost |      3002 |\\n+-----------+---------+-----------+-----------+\\nListCaption\\n\" user=foobar42\n"
-	b, err := ioutil.ReadFile(f.Name())
+	b, err := afero.ReadFile(fs, file.Name())
 	assert.NoError(err)
 	actual := string(b)
 

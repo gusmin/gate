@@ -1,13 +1,14 @@
 package shell
 
 import (
-	"os"
 	"testing"
 
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/require"
 )
 
 func TestReadline(t *testing.T) {
+	fs := afero.NewMemMapFs()
 	assert := require.New(t)
 
 	tt := []struct {
@@ -31,8 +32,8 @@ func TestReadline(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			f := mockInput(assert, tc.line)
-			defer os.Remove(f.Name())
+			f := mockInput(fs, assert, tc.line)
+			defer fs.Remove(f.Name())
 
 			prompt, err := NewSecureGatePrompt(f, nil)
 			assert.NoError(err)
@@ -51,6 +52,7 @@ func TestReadline(t *testing.T) {
 }
 
 func TestReadPassword(t *testing.T) {
+	fs := afero.NewMemMapFs()
 	assert := require.New(t)
 
 	tt := []struct {
@@ -75,8 +77,8 @@ func TestReadPassword(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			f := mockInput(assert, tc.line)
-			defer os.Remove(f.Name())
+			f := mockInput(fs, assert, tc.line)
+			defer fs.Remove(f.Name())
 
 			prompt, err := NewSecureGatePrompt(f, nil)
 			assert.NoError(err)

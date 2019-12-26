@@ -216,7 +216,7 @@ func (core *SecureGateCore) initSSHKeys(keysPath string) error {
 	return nil
 }
 
-// loadPublicSSHKey parse the public ssh key located keysPath and
+// loadPublicSSHKey parse the public ssh key located in keysPath and
 // set the user public key to the parsed key if no error occured.
 func (core *SecureGateCore) loadPublicSSHKey(keysPath string) error {
 	key, err := ioutil.ReadFile(path.Join(keysPath, "id_rsa.pub"))
@@ -302,8 +302,6 @@ func (core *SecureGateCore) updateUser(ctx context.Context) error {
 // updateAgents update agents authorized_keys file depending on permissions
 // changes.
 func (core *SecureGateCore) updateAgents(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
-	defer cancel()
 	user, err := core.DB.GetUser(core.User().ID)
 	if err != nil {
 		return err
@@ -346,6 +344,9 @@ func (core *SecureGateCore) updateAgents(ctx context.Context) error {
 			})
 		}
 	}
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
+	defer cancel()
 
 	// Agent running on accessible node must add our public key to authorized_keys
 	// if the user got rights to access the node.

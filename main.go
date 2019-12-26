@@ -37,19 +37,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	configFile      = "config"
-	logFile         = "/var/log/securegate/gate/gate.log"
-	translationsDir = "/var/lib/securegate/gate/translations"
-)
+var version string
 
 func main() {
-	cfg, err := config.FromFile(configFile)
+	var (
+		configPath      = "/etc/securegate/gate/config.json"
+		logFile         = "/var/log/securegate/gate/gate.log"
+		translationsDir = "/var/lib/securegate/gate/translations"
+	)
+
+	cfg, err := config.FromFile(configPath)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	// open DB
 	repo := database.NewSecureGateBoltRepository(cfg.DBPath)
 	err = repo.OpenDatabase()
 	if err != nil {

@@ -1,16 +1,16 @@
 package shell
 
 import (
-	"io/ioutil"
 	"os"
 
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/require"
 )
 
 // mockInput creates a new open file descriptor which contains
 // user inputs and makes the caller test fail if any error occurs.
-func mockInput(assert *require.Assertions, input string) *os.File {
-	tmp, err := ioutil.TempFile("", "")
+func mockInput(fs afero.Fs, assert *require.Assertions, input string) afero.File {
+	tmp, err := afero.TempFile(fs, "", "")
 	assert.NoError(err)
 
 	_, err = tmp.WriteString(input)

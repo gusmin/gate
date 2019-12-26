@@ -3,16 +3,13 @@ package database
 
 import (
 	"encoding/json"
-	"path"
 
 	"github.com/boltdb/bolt"
+	"github.com/pkg/errors"
 )
 
 const (
-	// Default database file name
-	databaseName = "securegate.db"
-	// Name of the bucket where all users are stored
-	usersBucketName = "users"
+	usersBucketName = "users" // Name of the bucket where all users are stored
 )
 
 // SecureGateBoltRepository is a database repository interacting
@@ -27,7 +24,7 @@ type SecureGateBoltRepository struct {
 }
 
 // NewSecureGateBoltRepository instanciates a new SecureGateBoltRepository
-// who can communicate with a Bolt database at the given path.
+// who can communicate with a Bolt database located at the given path.
 func NewSecureGateBoltRepository(path string) *SecureGateBoltRepository {
 	return &SecureGateBoltRepository{
 		Path: path,
@@ -40,9 +37,9 @@ func NewSecureGateBoltRepository(path string) *SecureGateBoltRepository {
 // do not exist.
 func (repo *SecureGateBoltRepository) OpenDatabase() error {
 	// Open database or create one if none exist already.
-	db, err := bolt.Open(path.Join(repo.Path, databaseName), 0666, nil)
+	db, err := bolt.Open(repo.Path, 0666, nil)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "could not open the database located in: %s", repo.Path)
 	}
 
 	// Create the top-level buckets.
